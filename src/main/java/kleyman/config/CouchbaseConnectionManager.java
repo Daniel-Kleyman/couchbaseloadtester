@@ -3,28 +3,46 @@ package kleyman.config;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
+import kleyman.util.EnvironmentVariableUtils;
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class CouchbaseConnectionManager {
+/**
+ * Manages the connection to a Couchbase database.
+ */
+public class CouchbaseConnectionManager implements AutoCloseable {
+    private static final Logger logger = LoggerFactory.getLogger(CouchbaseConnectionManager.class);
     private final Cluster cluster;
-    private final Bucket bucket;
+    @Getter
     private final Collection collection;
 
+    /**
+     * Initializes a new CouchbaseConnectionManager by connecting to the Couchbase cluster
+     * using credentials and bucket name from environment variables.
+     */
     public CouchbaseConnectionManager() {
-        // Fetch configuration details from environment variables
-        String username = System.getenv("COUCHBASE_USERNAME");
-        String password = System.getenv("COUCHBASE_PASSWORD");
-        String bucketName = System.getenv("COUCHBASE_BUCKET_NAME");
+        String host = EnvironmentVariableUtils.getEnv("COUCHBASE_HOST");
+        String username = EnvironmentVariableUtils.getEnv("COUCHBASE_USERNAME");
+        String password = EnvironmentVariableUtils.getEnv("COUCHBASE_PASSWORD");
+        String bucketName = EnvironmentVariableUtils.getEnv("COUCHBASE_BUCKET_NAME");
 
-        cluster = Cluster.connect("localhost", username, password);
-        bucket = cluster.bucket(bucketName);
-        collection = bucket.defaultCollection();
+        try {
+            cluster = Cluster.connect(host, username, password);
+            Bucket bucket = cluster.bucket(bucketName);
+            collection = bucket.defaultCollection();
+            logger.info("Successfully connected to Couchbase bucket: {}", bucketName);
+        } catch (Exception e) {
+            logger.error("Failed to connect to Couchbase cluster: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to connect to Couchbase", e);
+        }
     }
 
-    public Collection getCollection() {
-        return collection;
-    }
-
-    public void closeConnection() {
-        cluster.disconnect();
+    @Override
+    public void close() {
+        if (cluster != null) {
+            cluster.disconnect();
+            logger.info("Couchbase connection closed.");
+        }
     }
 }
