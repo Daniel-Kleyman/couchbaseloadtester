@@ -1,8 +1,10 @@
 package kleyman.config;
 
+import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.kv.GetResult;
 import kleyman.util.EnvironmentVariableUtils;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -43,6 +45,23 @@ public class CouchbaseConnectionManager implements AutoCloseable {
         if (cluster != null) {
             cluster.disconnect();
             logger.info("Couchbase connection closed.");
+        }
+    }
+
+    /**
+     * Ensures the Couchbase bucket is opened by performing an initial operation.
+     * This should be called before starting load test threads to avoid the lazy bucket opening during the test.
+     */
+    public void initializeBucket() {
+        try {
+            // Attempt to retrieve a non-existent key (or any other simple operation)
+            GetResult result = collection.get("initialization_check_key");
+            logger.info("Bucket opened and initialized successfully.");
+        } catch (CouchbaseException e) {
+            logger.info("Bucket opened (non-existent key returned).");
+        } catch (Exception e) {
+            logger.error("Unexpected error during bucket initialization: {}", e.getMessage(), e);
+            throw new RuntimeException("Error during bucket initialization", e);
         }
     }
 }

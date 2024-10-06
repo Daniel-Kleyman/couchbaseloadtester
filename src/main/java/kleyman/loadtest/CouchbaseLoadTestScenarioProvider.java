@@ -12,13 +12,13 @@ import kleyman.config.CouchbaseConnectionManager;
  * Factory class for creating load testing scenarios for Couchbase.
  * This class defines various test scenarios for benchmarking Couchbase's key-value functionality.
  */
-public class CouchbaseLoadTestScenarioFactory {
-    private static final Logger logger = LoggerFactory.getLogger(CouchbaseLoadTestScenarioFactory.class); // Logger instance
+public class CouchbaseLoadTestScenarioProvider {
+    private static final Logger logger = LoggerFactory.getLogger(CouchbaseLoadTestScenarioProvider.class); // Logger instance
     private final CouchbaseService couchbaseService;
     private final String jsonBigPath = EnvironmentVariableUtils.getEnv("JSON_BIG_PATH");
     private final String jsonSmallPath = EnvironmentVariableUtils.getEnv("JSON_SMALL_PATH");
 
-    public CouchbaseLoadTestScenarioFactory(CouchbaseConnectionManager connectionManager) {
+    public CouchbaseLoadTestScenarioProvider(CouchbaseConnectionManager connectionManager) {
         this.couchbaseService = new CouchbaseService(connectionManager);
     }
 
@@ -29,6 +29,7 @@ public class CouchbaseLoadTestScenarioFactory {
      */
     public List<CouchbaseLoadTestExecutor> createScenarios() {
         logger.info("Creating Couchbase load test scenarios.");
+        // Defines scenarios with 5, 10, or 15 threads, using either big or small JSON data, and using unique or shared keys for each operation.
         List<CouchbaseLoadTestExecutor> scenarios = List.of(
                 new CouchbaseLoadTestExecutor(5, jsonBigPath, true, couchbaseService),
                 new CouchbaseLoadTestExecutor(5, jsonBigPath, false, couchbaseService),
@@ -43,9 +44,7 @@ public class CouchbaseLoadTestScenarioFactory {
                 new CouchbaseLoadTestExecutor(15, jsonSmallPath, true, couchbaseService),
                 new CouchbaseLoadTestExecutor(15, jsonSmallPath, false, couchbaseService)
         );
-        List<CouchbaseLoadTestExecutor> scenarios1 = List.of(
-                new CouchbaseLoadTestExecutor(5, jsonBigPath, true, couchbaseService));
         logger.info("Created {} load test scenarios.", scenarios.size());
-        return scenarios1;
+        return scenarios;
     }
 }

@@ -1,7 +1,7 @@
 package kleyman.testrunner;
 
 import kleyman.config.CouchbaseConnectionManager;
-import kleyman.loadtest.CouchbaseLoadTestScenarioFactory;
+import kleyman.loadtest.CouchbaseLoadTestScenarioProvider;
 import kleyman.loadtest.CouchbaseLoadTestExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +18,11 @@ public class CouchbaseTestRunner implements TestRunner {
         logger.info("Starting Couchbase Load Tests");
 
         try (CouchbaseConnectionManager connectionManager = new CouchbaseConnectionManager()) {
-            CouchbaseLoadTestScenarioFactory scenarioFactory = new CouchbaseLoadTestScenarioFactory(connectionManager);
+            if (!initializeCouchbaseBucket(connectionManager)) return;
+            CouchbaseLoadTestScenarioProvider scenarioFactory = new CouchbaseLoadTestScenarioProvider(connectionManager);
             for (CouchbaseLoadTestExecutor scenario : scenarioFactory.createScenarios()) {
                 try {
-                    logger.info("Running scenario with {} threads and uniqueKeys={}",
+                    logger.info("Running scenario with {} threads and uniqueKeys: {}",
                             scenario.getThreadCount(),
                             scenario.isUseUniqueKeys());
                     scenario.executeLoadTest();
@@ -35,5 +36,20 @@ public class CouchbaseTestRunner implements TestRunner {
         }
 
         logger.info("All load tests completed.");
+    }
+
+    /**
+     * Ensures the Couchbase bucket is opened by performing an initial operation.
+     * This should be called before starting load test threads to avoid the lazy bucket opening during the test.
+     */
+    private boolean initializeCouchbaseBucket(CouchbaseConnectionManager connectionManager) {
+        logger.info("Initializing Couchbase bucket...");
+        try {
+            connectionManager.initializeBucket();
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to initialize Couchbase bucket. Aborting load test.", e);
+            return false;
+        }
     }
 }

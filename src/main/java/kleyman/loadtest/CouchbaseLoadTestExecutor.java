@@ -16,14 +16,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * Couchbase implementation of the LoadTestExecutor interface for conducting load tests.
  */
-public class CouchbaseLoadTestExecutor implements LoadTestExecutor<JsonObject> {
+public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
     private static final Logger logger = LoggerFactory.getLogger(CouchbaseLoadTestExecutor.class); // Logger instance
     @Getter
     private final int threadCount;
     @Getter
     private final boolean useUniqueKeys;
     private final String jsonFilePath;
-    private final long testDurationMillis = TimeUnit.MINUTES.toMillis(3);
+    private final long testDurationMillis;
     private final CouchbaseService couchbaseService;
 
     /**
@@ -39,6 +39,7 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor<JsonObject> {
         this.jsonFilePath = jsonFilePath;
         this.useUniqueKeys = useUniqueKeys;
         this.couchbaseService = couchbaseService;
+        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "180000"));
     }
 
     /**
@@ -47,21 +48,30 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor<JsonObject> {
      */
     @Override
     public void executeLoadTest() {
-        logger.info("Starting load test with {} threads using unique keys: {}", threadCount, useUniqueKeys);
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-        JsonObject jsonData;
+        JsonObject jsonData = loadJsonDataFromFile();
+        if (jsonData == null) return;
+        startLoadTest(jsonData);
+        logger.info("Load test completed.");
+    }
+
+    private JsonObject loadJsonDataFromFile() {
+        logger.info("Loading JSON data from file: {}", jsonFilePath);
         try {
-            jsonData = JsonFileReaderUtils.readJsonFromFile(jsonFilePath);
+            return JsonFileReaderUtils.readJsonFromFile(jsonFilePath);
         } catch (IOException e) {
             logger.error("Failed to read JSON data from file: {}", jsonFilePath, e);
-            return;
+            return null;
         }
+    }
+
+    private void startLoadTest(JsonObject jsonData) {
+        logger.info("Starting load test with {} threads using unique keys: {}", threadCount, useUniqueKeys);
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         for (int i = 1; i <= threadCount; i++) {
             final int threadId = i;
             executor.submit(() -> performThreadOperations(threadId, jsonData));
         }
         shutdownExecutor(executor);
-        logger.info("Load test completed.");
     }
 
     /**
@@ -73,9 +83,9 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor<JsonObject> {
      */
     private void performThreadOperations(int threadId, JsonObject jsonData) {
         logger.info("Thread {} starting operations.", threadId);
-        String key = createKeyKey(threadId);
         long startTime = System.currentTimeMillis();
         while (System.currentTimeMillis() - startTime <= testDurationMillis) {
+            String key = createKeyKey(threadId);
             try {
                 couchbaseService.upload(key, jsonData);
                 logger.debug("Thread {}: Uploaded data for key: {}", threadId, key);
@@ -90,17 +100,28 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor<JsonObject> {
         logger.info("Thread {} completed operations.", threadId);
     }
 
-    public String createKeyKey(int threadId) {
+    private String createKeyKey(int threadId) {
         return useUniqueKeys ? "user::" + threadId + "::" + System.nanoTime() : "user::shared";
     }
 
+    /**
+     * Shuts down the ExecutorService and waits for tasks to complete.
+     *
+     * @param executor the ExecutorService to shut down
+     */
     private void shutdownExecutor(ExecutorService executor) {
         executor.shutdown();
         try {
-            executor.awaitTermination(3, TimeUnit.MINUTES);
+            boolean terminated = executor.awaitTermination(60, TimeUnit.MINUTES);
+            if (!terminated) {
+                logger.warn("Executor did not terminate in the specified time.");
+            } else {
+                logger.info("Executor terminated successfully.");
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             logger.error("Executor service interrupted during shutdown.", e);
         }
     }
+
 }

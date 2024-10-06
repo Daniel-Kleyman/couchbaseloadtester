@@ -20,17 +20,11 @@ public class CouchbaseService implements DataBaseService<JsonObject> {
         this.connectionManager = connectionManager;
     }
 
-    /**
-     * Inserts a JSON document into Couchbase by key.
-     *
-     * @param key      the key under which to store the JSON document
-     * @param jsonData the JSON object to insert
-     */
     @Override
     public void upload(String key, JsonObject jsonData) {
         try {
             connectionManager.getCollection().upsert(key, jsonData);
-            logger.info("Successfully inserted JSON document with key: {}", key);
+            logger.debug("Successfully inserted JSON document with key: {}", key);
         } catch (CouchbaseException e) {
             logger.error("Couchbase error inserting JSON document with key: {}", key, e);
             throw e;
@@ -40,12 +34,6 @@ public class CouchbaseService implements DataBaseService<JsonObject> {
         }
     }
 
-    /**
-     * Retrieves a JSON document from Couchbase by key.
-     *
-     * @param key the ID of the document to retrieve
-     * @return the retrieved JSON object
-     */
     @Override
     public JsonObject retrieve(String key) {
         try {
@@ -53,7 +41,7 @@ public class CouchbaseService implements DataBaseService<JsonObject> {
             if (jsonObject == null) {
                 throw new CouchbaseException("Document not found for key: " + key);
             }
-            logger.info("Successfully retrieved JSON document with ID: {}", key);
+            logger.debug("Successfully retrieved JSON document with ID: {}", key);
             return jsonObject;
         } catch (CouchbaseException e) {
             logger.error("Couchbase error retrieving JSON document with key: {}", key, e);
@@ -64,11 +52,6 @@ public class CouchbaseService implements DataBaseService<JsonObject> {
         }
     }
 
-    /**
-     * Retrieves the specified JSON document from Couchbase three times.
-     *
-     * @param key the key of the document to retrieve
-     */
     public void retrieveJsonThreeTimes(String key) {
         for (int i = 0; i < 3; i++) {
             try {
