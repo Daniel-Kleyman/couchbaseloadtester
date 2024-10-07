@@ -24,7 +24,7 @@ public class CouchbaseService implements DataBaseService<JsonObject> {
     public void upload(String key, JsonObject jsonData) {
         try {
             connectionManager.getCollection().upsert(key, jsonData);
-            logger.debug("Successfully inserted JSON document with key: {}", key);
+            logger.info("Successfully inserted JSON document with key: {}", key);
         } catch (CouchbaseException e) {
             logger.error("Couchbase error inserting JSON document with key: {}", key, e);
             throw e;
@@ -41,7 +41,7 @@ public class CouchbaseService implements DataBaseService<JsonObject> {
             if (jsonObject == null) {
                 throw new CouchbaseException("Document not found for key: " + key);
             }
-            logger.debug("Successfully retrieved JSON document with ID: {}", key);
+            logger.info("Successfully retrieved JSON document with ID: {}", key);
             return jsonObject;
         } catch (CouchbaseException e) {
             logger.error("Couchbase error retrieving JSON document with key: {}", key, e);
