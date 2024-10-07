@@ -1,6 +1,7 @@
 package kleyman.loadtest;
 
 import java.util.List;
+
 import kleyman.service.CouchbaseService;
 import kleyman.util.EnvironmentVariableUtils;
 import lombok.Getter;
@@ -16,12 +17,14 @@ public class CouchbaseLoadTestScenarioProvider {
     private final CouchbaseService couchbaseService;
     private final String jsonBigPath = EnvironmentVariableUtils.getEnv("JSON_BIG_PATH");
     private final String jsonSmallPath = EnvironmentVariableUtils.getEnv("JSON_SMALL_PATH");
+    // Define a constant list of connection pool sizes to test different configurations
     public static final List<Integer> connectionPoolSize = List.of(5, 10, 15);
     @Getter
     public final CouchbaseLoadTestExecutor executorForConnectionPoolTest;
 
     public CouchbaseLoadTestScenarioProvider(CouchbaseService couchbaseService) {
         this.couchbaseService = couchbaseService;
+        // Create an instance of CouchbaseLoadTestExecutor with 10 threads for connection pool tests
         executorForConnectionPoolTest = new CouchbaseLoadTestExecutor(10, jsonBigPath, true, couchbaseService);
     }
 
@@ -48,9 +51,7 @@ public class CouchbaseLoadTestScenarioProvider {
                 new CouchbaseLoadTestExecutor(15, jsonSmallPath, false, couchbaseService)
         );
         logger.info("Created {} load test scenarios.", scenarios.size());
-        List<CouchbaseLoadTestExecutor> scenarios1 = List.of(
-                new CouchbaseLoadTestExecutor(5, jsonBigPath, true, couchbaseService));
-        return scenarios1;
+        return scenarios;
     }
 
 

@@ -14,13 +14,15 @@ import org.slf4j.LoggerFactory;
 
 public class CouchbaseTestRunner implements TestRunner {
     private static final Logger logger = LoggerFactory.getLogger(CouchbaseTestRunner.class);
+    int numberOfTestRun = 0;
 
     @Override
     public void runTests() {
         logger.info("Starting Couchbase Load Tests");
-        // runThreadPoolTest();
+        runThreadPoolTest();
         runConnectionPoolTest();
-        logger.info("All load tests completed.");
+
+        logger.info("All load tests completed. " + numberOfTestRun);
     }
 
     private void runConnectionPoolTest() {
@@ -62,6 +64,7 @@ public class CouchbaseTestRunner implements TestRunner {
         logger.info("Running scenario with {} threads and uniqueKeys: {}", scenario.getThreadCount(), scenario.isUseUniqueKeys());
         scenario.executeLoadTest();
         logger.info("Scenario completed successfully.");
+        numberOfTestRun++;
     }
 
     private CouchbaseConnectionManager createConnectionManager(int connectionPoolSize) {

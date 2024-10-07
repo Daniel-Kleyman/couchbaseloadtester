@@ -39,7 +39,7 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
         this.jsonFilePath = jsonFilePath;
         this.useUniqueKeys = useUniqueKeys;
         this.couchbaseService = couchbaseService;
-        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "1000"));
+        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "180000"));
     }
 
     /**
