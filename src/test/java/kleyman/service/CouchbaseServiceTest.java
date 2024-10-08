@@ -14,6 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class CouchbaseServiceTest {
+    private static final String TEST_KEY = "testKey";
+    private static final String NON_EXISTENT_KEY = "nonExistentKey";
+    private static final String CONNECTION_FAILED_MESSAGE = "Connection failed";
+    private static final String UNEXPECTED_ERROR_MESSAGE = "Unexpected error";
+
     private CouchbaseConnectionManager connectionManager;
     private CouchbaseService couchbaseService;
     private JsonObject jsonData;
@@ -21,93 +26,94 @@ public class CouchbaseServiceTest {
     @BeforeEach
     void setUp() {
         connectionManager = Mockito.mock(CouchbaseConnectionManager.class);
-        var mockCollection = Mockito.mock(com.couchbase.client.java.Collection.class);
-        when(connectionManager.getCollection()).thenReturn(mockCollection);
         couchbaseService = new CouchbaseService(connectionManager);
         jsonData = JsonObject.create().put("field", "value");
+    }
+
+    private com.couchbase.client.java.Collection createMockCollection() {
+        return Mockito.mock(com.couchbase.client.java.Collection.class);
     }
 
     @Test
     @DisplayName("Test document insertion with valid JSON data")
     public void givenValidJson_whenInsertDocument_thenDocumentShouldBeInsertedSuccessfully() {
         // Given
-        String key = "testKey";
+        var mockCollection = createMockCollection();
+        when(connectionManager.getCollection()).thenReturn(mockCollection);
 
         // When
-        couchbaseService.upload(key, jsonData);
+        couchbaseService.upload(TEST_KEY, jsonData);
 
         // Then
-        verify(connectionManager.getCollection(), times(1)).upsert(key, jsonData);
+        verify(mockCollection, times(1)).upsert(TEST_KEY, jsonData);
     }
 
     @Test
     @DisplayName("Test upload functionality throws CouchbaseException on failure")
     public void givenCouchbaseException_whenUpload_thenShouldThrowCouchbaseException() {
         // Given
-        var mockCollection = connectionManager.getCollection();
-        when(mockCollection.upsert(anyString(), any())).thenThrow(new CouchbaseException("Connection failed"));
+        var mockCollection = createMockCollection();
+        when(connectionManager.getCollection()).thenReturn(mockCollection);
+        when(mockCollection.upsert(anyString(), any())).thenThrow(new CouchbaseException(CONNECTION_FAILED_MESSAGE));
 
         // When
         CouchbaseException thrownException = assertThrows(CouchbaseException.class, () -> {
-            couchbaseService.upload("testKey", jsonData);
+            couchbaseService.upload(TEST_KEY, jsonData);
         });
 
         // Then
-        assertEquals("Connection failed", thrownException.getMessage());
+        assertEquals(CONNECTION_FAILED_MESSAGE, thrownException.getMessage());
     }
 
     @Test
     @DisplayName("Test upload functionality throws RuntimeException on unexpected errors")
     public void givenUnexpectedException_whenUpload_thenShouldThrowRuntimeException() {
         // Given
-        var mockCollection = connectionManager.getCollection();
-        when(mockCollection.upsert(anyString(), any())).thenThrow(new RuntimeException("Unexpected error"));
-
-        // Ensure that the CouchbaseService uses the mocked collection
+        var mockCollection = createMockCollection();
         when(connectionManager.getCollection()).thenReturn(mockCollection);
+        when(mockCollection.upsert(anyString(), any())).thenThrow(new RuntimeException(UNEXPECTED_ERROR_MESSAGE));
 
         // When
         RuntimeException thrownException = assertThrows(RuntimeException.class, () -> {
-            couchbaseService.upload("testKey", jsonData);
+            couchbaseService.upload(TEST_KEY, jsonData);
         });
 
         // Then
-        assertEquals("Unexpected error inserting document with key: testKey", thrownException.getMessage());
+        assertEquals("Unexpected error inserting document with key: " + TEST_KEY, thrownException.getMessage());
     }
 
     @Test
-    void givenValidKey_whenRetrieveDocument_thenDocumentShouldBeRetrievedSuccessfully() {
+    @DisplayName("Should retrieve document successfully when given a valid key")
+    public void givenValidKey_whenRetrieveDocument_thenDocumentShouldBeRetrievedSuccessfully() {
         // Given
-        String key = "testKey";
+        var mockCollection = createMockCollection();
+        when(connectionManager.getCollection()).thenReturn(mockCollection);
         JsonObject expectedJson = JsonObject.create().put("field", "value");
-        var mockCollection = connectionManager.getCollection();
 
         // Mocking GetResult to return expected JSON data
         GetResult mockGetResult = mock(GetResult.class);
-        when(mockCollection.get(key)).thenReturn(mockGetResult);
+        when(mockCollection.get(TEST_KEY)).thenReturn(mockGetResult);
         when(mockGetResult.contentAs(JsonObject.class)).thenReturn(expectedJson);
 
         // When
-        JsonObject actualJson = couchbaseService.retrieve(key);
+        JsonObject actualJson = couchbaseService.retrieve(TEST_KEY);
 
         // Then
         assertEquals(expectedJson, actualJson);
-        verify(mockCollection, times(1)).get(key);
+        verify(mockCollection, times(1)).get(TEST_KEY);
     }
 
     @Test
     @DisplayName("Test retrieve functionality throws CouchbaseException when document is not found")
     public void givenDocumentNotFound_whenRetrieve_thenShouldThrowCouchbaseException() {
         // Given
-        String key = "nonExistentKey";
-        var mockCollection = connectionManager.getCollection();
-
-        // Mocking the collection's behavior to throw a CouchbaseException when the document is not found
-        when(mockCollection.get(key)).thenThrow(new CouchbaseException("Document not found"));
+        var mockCollection = createMockCollection();
+        when(connectionManager.getCollection()).thenReturn(mockCollection);
+        when(mockCollection.get(NON_EXISTENT_KEY)).thenThrow(new CouchbaseException("Document not found"));
 
         // When
         CouchbaseException thrownException = assertThrows(CouchbaseException.class, () -> {
-            couchbaseService.retrieve(key);
+            couchbaseService.retrieve(NON_EXISTENT_KEY);
         });
 
         // Then
@@ -118,76 +124,70 @@ public class CouchbaseServiceTest {
     @DisplayName("Test retrieve functionality throws RuntimeException on unexpected errors")
     public void givenUnexpectedException_whenRetrieve_thenShouldThrowRuntimeException() {
         // Given
-        String key = "testKey";
-        var mockCollection = connectionManager.getCollection();
-
-        // Mocking the collection's behavior to throw an unexpected RuntimeException
-        when(mockCollection.get(key)).thenThrow(new RuntimeException("Unexpected error"));
+        var mockCollection = createMockCollection();
+        when(connectionManager.getCollection()).thenReturn(mockCollection);
+        when(mockCollection.get(TEST_KEY)).thenThrow(new RuntimeException(UNEXPECTED_ERROR_MESSAGE));
 
         // When
         RuntimeException thrownException = assertThrows(RuntimeException.class, () -> {
-            couchbaseService.retrieve(key);
+            couchbaseService.retrieve(TEST_KEY);
         });
 
         // Then
-        assertEquals("Unexpected error retrieving document with key: testKey", thrownException.getMessage());
+        assertEquals("Unexpected error retrieving document with key: " + TEST_KEY, thrownException.getMessage());
     }
 
     @Test
     @DisplayName("Test retrieveJsonThreeTimes successfully retrieves JSON document")
     public void givenValidKey_whenRetrieveJsonThreeTimes_thenShouldRetrieveSuccessfully() {
         // Given
-        String key = "testKey";
+        var mockCollection = createMockCollection();
+        when(connectionManager.getCollection()).thenReturn(mockCollection);
         JsonObject expectedJson = JsonObject.create().put("field", "value");
-        var mockCollection = connectionManager.getCollection();
 
         // Mocking the collection's behavior to return expected JSON data
         GetResult mockGetResult = mock(GetResult.class);
-        when(mockCollection.get(key)).thenReturn(mockGetResult);
+        when(mockCollection.get(TEST_KEY)).thenReturn(mockGetResult);
         when(mockGetResult.contentAs(JsonObject.class)).thenReturn(expectedJson);
 
         // When
-        couchbaseService.retrieveJsonThreeTimes(key);
+        couchbaseService.retrieveJsonThreeTimes(TEST_KEY);
 
         // Then
-        verify(mockCollection, times(3)).get(key);
+        verify(mockCollection, times(3)).get(TEST_KEY);
     }
 
     @Test
     @DisplayName("Test retrieveJsonThreeTimes throws CouchbaseException on first attempt")
     public void givenCouchbaseExceptionOnFirstAttempt_whenRetrieveJsonThreeTimes_thenShouldThrowCouchbaseException() {
         // Given
-        String key = "testKey";
-        var mockCollection = connectionManager.getCollection();
-
-        // Mocking the collection's behavior to throw CouchbaseException on first attempt
-        when(mockCollection.get(key)).thenThrow(new CouchbaseException("Connection failed"));
+        var mockCollection = createMockCollection();
+        when(connectionManager.getCollection()).thenReturn(mockCollection);
+        when(mockCollection.get(TEST_KEY)).thenThrow(new CouchbaseException(CONNECTION_FAILED_MESSAGE));
 
         // When & Then
         CouchbaseException thrownException = assertThrows(CouchbaseException.class, () -> {
-            couchbaseService.retrieveJsonThreeTimes(key);
+            couchbaseService.retrieveJsonThreeTimes(TEST_KEY);
         });
 
-        assertEquals("Connection failed", thrownException.getMessage());
-        verify(mockCollection, times(1)).get(key); // Verify that it only tried once
+        assertEquals(CONNECTION_FAILED_MESSAGE, thrownException.getMessage());
+        verify(mockCollection, times(1)).get(TEST_KEY); // Verify that it only tried once
     }
 
     @Test
     @DisplayName("Test retrieveJsonThreeTimes throws RuntimeException on unexpected error")
     public void givenUnexpectedExceptionOnFirstAttempt_whenRetrieveJsonThreeTimes_thenShouldThrowRuntimeException() {
         // Given
-        String key = "testKey";
-        var mockCollection = connectionManager.getCollection();
-
-        // Mocking the collection's behavior to throw RuntimeException on first attempt
-        when(mockCollection.get(key)).thenThrow(new RuntimeException("Unexpected error"));
+        var mockCollection = createMockCollection();
+        when(connectionManager.getCollection()).thenReturn(mockCollection);
+        when(mockCollection.get(TEST_KEY)).thenThrow(new RuntimeException(UNEXPECTED_ERROR_MESSAGE));
 
         // When & Then
         RuntimeException thrownException = assertThrows(RuntimeException.class, () -> {
-            couchbaseService.retrieveJsonThreeTimes(key);
+            couchbaseService.retrieveJsonThreeTimes(TEST_KEY);
         });
 
-        assertEquals("Unexpected error retrieving document with key: testKey", thrownException.getMessage());
-        verify(mockCollection, times(1)).get(key); // Verify that it only tried once
+        assertEquals("Unexpected error retrieving document with key: " + TEST_KEY, thrownException.getMessage());
+        verify(mockCollection, times(1)).get(TEST_KEY); // Verify that it only tried once
     }
 }

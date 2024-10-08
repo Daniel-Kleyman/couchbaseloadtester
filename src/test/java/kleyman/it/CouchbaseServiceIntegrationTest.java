@@ -1,69 +1,93 @@
-//package kleyman.it;
-//
-//package kleyman.service;
-//
-//import com.couchbase.client.core.error.CouchbaseException;
-//import com.couchbase.client.java.Bucket;
-//import com.couchbase.client.java.Cluster;
-//import com.couchbase.client.java.json.JsonObject;
-//import kleyman.config.CouchbaseConnectionManager;
-//import kleyman.service.CouchbaseService;
-//import org.junit.jupiter.api.BeforeAll;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.testcontainers.containers.CouchbaseContainer;
-//import org.testcontainers.junit.jupiter.Container;
-//import org.testcontainers.junit.jupiter.Testcontainers;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//
-//@Testcontainers
-//class CouchbaseServiceIntegrationTest {
-//
-//    @Container
-//    private static final CouchbaseContainer couchbaseContainer = new CouchbaseContainer("couchbase:latest")
-//            .withBucket("testBucket");
-//
-//    private static CouchbaseService couchbaseService;
-//
-//    @BeforeAll
-//    static void setUp() {
-//        Cluster cluster = Cluster.connect(couchbaseContainer.getHost(),
-//                couchbaseContainer.getUsername(),
-//                couchbaseContainer.getPassword());
-//        Bucket bucket = cluster.bucket("testBucket");
-//        CouchbaseConnectionManager connectionManager = new CouchbaseConnectionManager(0);
-//        couchbaseService = new CouchbaseService(connectionManager);
-//    }
-//
-//    @Test
-//    void givenValidKeyAndJsonData_whenUploadCalled_thenDocumentInsertedSuccessfully() {
-//        String key = "testKey";
-//        JsonObject jsonData = JsonObject.create().put("field", "value");
-//
-//        couchbaseService.upload(key, jsonData);
-//
-//        JsonObject retrievedData = couchbaseService.retrieve(key);
-//        assertEquals(jsonData, retrievedData);
-//    }
-//
-//    @Test
-//    void givenValidKey_whenRetrieveCalled_thenDocumentRetrievedSuccessfully() {
-//        String key = "testKey";
-//        JsonObject jsonData = JsonObject.create().put("field", "value");
-//        couchbaseService.upload(key, jsonData);
-//
-//        JsonObject result = couchbaseService.retrieve(key);
-//
-//        assertEquals(jsonData, result);
-//    }
-//
-//    @Test
-//    void givenInvalidKey_whenRetrieveCalled_thenThrowCouchbaseException() {
-//        String key = "invalidKey";
-//
-//        CouchbaseException thrown = assertThrows(CouchbaseException.class, () -> couchbaseService.retrieve(key));
-//        assertEquals("Document not found for key: invalidKey", thrown.getMessage());
-//    }
-//}
+package kleyman.it;
+
+import com.couchbase.client.core.error.CouchbaseException;
+import com.couchbase.client.java.json.JsonObject;
+import kleyman.config.CouchbaseConnectionManager;
+import kleyman.service.CouchbaseService;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class CouchbaseServiceIntegrationTest {
+
+    private static CouchbaseConnectionManager connectionManager;
+    private static CouchbaseService couchbaseService;
+
+    @BeforeAll
+    static void setUp() {
+        connectionManager = new CouchbaseConnectionManager(0);
+        couchbaseService = new CouchbaseService(connectionManager);
+        connectionManager.initializeBucket();
+    }
+
+    @Test
+    @DisplayName("Test insert document successfully when given valid key and jsonData")
+    public void givenValidIdAndContent_whenInsertDocument_thenSuccess() {
+        // Given
+        String key = "test-upload-doc";
+        JsonObject jsonData = JsonObject.create().put("name", "Integration Test");
+
+        // When
+        couchbaseService.upload(key, jsonData);
+        JsonObject retrievedData = couchbaseService.retrieve(key);
+
+        // Then
+        assertNotNull(retrievedData);
+        assertEquals(jsonData, retrievedData);
+    }
+
+    @Test
+    @DisplayName("Test retrieve document successfully when given valid key")
+    public void givenValidId_whenRetrieveDocument_thenSuccess() {
+        // Given
+        String key = "test-retrieve-doc";
+        JsonObject jsonData = JsonObject.create().put("name", "Integration Test");
+        couchbaseService.upload(key, jsonData);
+
+        // When
+        JsonObject retrievedData = couchbaseService.retrieve(key);
+
+        // Then
+        assertNotNull(retrievedData);
+        assertEquals(jsonData, retrievedData);
+    }
+
+    @Test
+    @DisplayName("Test upload throws CouchbaseException for invalid document")
+    public void givenInvalidId_whenUpload_thenThrowsCouchbaseException() {
+        // Given
+        String invalidKey = "";
+        JsonObject jsonData = JsonObject.create().put("name", "Integration Test");
+
+        // When & Then
+        Exception exception = assertThrows(Exception.class, () -> {
+            couchbaseService.upload(invalidKey, jsonData);
+        });
+
+        assertInstanceOf(CouchbaseException.class, exception);
+    }
+
+    @Test
+    @DisplayName("Test retrieve throws CouchbaseException when document not found")
+    public void givenInvalidKey_whenRetrieve_thenThrowsCouchbaseException() {
+        // Given
+        String key = "non-existing-doc";
+
+        // When & Then
+        Exception exception = assertThrows(Exception.class, () -> {
+            couchbaseService.retrieve(key);
+        });
+
+        assertInstanceOf(CouchbaseException.class, exception, "Expected CouchbaseException to be thrown");
+    }
+
+    @AfterAll
+    static void tearDown() {
+        if (connectionManager != null) {
+            connectionManager.close();
+        }
+    }
+}

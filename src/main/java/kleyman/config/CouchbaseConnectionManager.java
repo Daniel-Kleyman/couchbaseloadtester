@@ -20,16 +20,17 @@ import java.io.Closeable;
  */
 public class CouchbaseConnectionManager implements AutoCloseable {
     private static final Logger logger = LoggerFactory.getLogger(CouchbaseConnectionManager.class);
+    @Getter
     private final Cluster cluster;
     @Getter
     private final Collection collection;
-    private ClusterEnvironment env = null;
+    private ClusterEnvironment env;
 
     /**
      * Initializes a new CouchbaseConnectionManager by connecting to the Couchbase cluster
-     * using credentials and bucket name from environment variables and also connectionpool size.
-     * Need to mention, that "ioConfig" and "numKvConnections" still present in current couchbase
-     * documentation and work fine, though marked as "deprecated" by ide for unknown reason
+     * using credentials and bucket name from environment variables and also connection pool size.
+     * Note: "ioConfig" and "numKvConnections" are marked as "deprecated" in current Couchbase
+     * documentation but still work fine.
      */
     public CouchbaseConnectionManager(int customPoolSize) {
         String host = EnvironmentVariableUtils.getEnv("COUCHBASE_HOST");
@@ -37,29 +38,44 @@ public class CouchbaseConnectionManager implements AutoCloseable {
         String password = EnvironmentVariableUtils.getEnv("COUCHBASE_PASSWORD");
         String bucketName = EnvironmentVariableUtils.getEnv("COUCHBASE_BUCKET_NAME");
 
+        this.env = createClusterEnvironment(customPoolSize);
+        this.cluster = connectToCluster(host, username, password);
+        this.collection = initializeBucket(bucketName);
+    }
+
+    private ClusterEnvironment createClusterEnvironment(int customPoolSize) {
+        if (customPoolSize > 0) {
+            logger.info("Custom KV connection pool size set to: {}", customPoolSize);
+            return ClusterEnvironment.builder()
+                    .ioConfig(IoConfig.numKvConnections(customPoolSize))
+                    .build();
+        } else {
+            logger.info("Using default KV connection pool size.");
+            return null;
+        }
+    }
+
+    private Cluster connectToCluster(String host, String username, String password) {
         try {
-            if (customPoolSize > 0) {
-                // Initialize a ClusterEnvironment with the specified KV connection pool size
-                env = ClusterEnvironment.builder()
-                        .ioConfig(IoConfig.numKvConnections(customPoolSize))
-                        .build();
-
-                // Create the cluster using the environment's custom client settings
-                cluster = Cluster.connect(host,
-                        ClusterOptions.clusterOptions(username, password).environment(env));
-                logger.info("Custom KV connection pool size set to: {}", customPoolSize);
+            if (env != null) {
+                return Cluster.connect(host, ClusterOptions.clusterOptions(username, password).environment(env));
             } else {
-                // Use the default connection method
-                cluster = Cluster.connect(host, username, password);
-                logger.info("Using default KV connection pool size.");
+                return Cluster.connect(host, username, password);
             }
-
-            Bucket bucket = cluster.bucket(bucketName);
-            collection = bucket.defaultCollection();
-            logger.info("Successfully connected to Couchbase bucket: {}", bucketName);
         } catch (Exception e) {
             logger.error("Failed to connect to Couchbase cluster: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to connect to Couchbase", e);
+        }
+    }
+
+    private Collection initializeBucket(String bucketName) {
+        try {
+            Bucket bucket = cluster.bucket(bucketName);
+            logger.info("Successfully connected to Couchbase bucket: {}", bucketName);
+            return bucket.defaultCollection();
+        } catch (Exception e) {
+            logger.error("Failed to initialize bucket: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to initialize bucket", e);
         }
     }
 
