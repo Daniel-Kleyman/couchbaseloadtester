@@ -44,35 +44,34 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
 
     /**
      * Starts the load test by initializing the executor service and running multiple threads.
-     * Each thread will perform upload and retrieval operations based on the specified configuration.
+     * Each thread will perform upload of JSON file from file system and retrieval operations
+     * based on the specified configuration.
      */
+
     @Override
     public void executeLoadTest() {
-        JsonObject jsonData = loadJsonDataFromFile();
-        if (jsonData == null) return;
-        startLoadTest(jsonData);
-        logger.info("Load test completed.");
-    }
-
-    private JsonObject loadJsonDataFromFile() {
-        logger.info("Loading JSON data from file: {}", jsonFilePath);
-        try {
-            return JsonFileReaderUtils.readJsonFromFile(jsonFilePath);
-        } catch (IOException e) {
-            logger.error("Failed to read JSON data from file: {}", jsonFilePath, e);
-            return null;
-        }
-    }
-
-    private void startLoadTest(JsonObject jsonData) {
         logger.info("Starting load test with {} threads using unique keys: {}", threadCount, useUniqueKeys);
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         for (int i = 1; i <= threadCount; i++) {
+            JsonObject jsonData = loadJsonDataFromFile(jsonFilePath + i + ".json");
+            if (jsonData == null) return;
             final int threadId = i;
             executor.submit(() -> performThreadOperations(threadId, jsonData));
         }
         shutdownExecutor(executor);
+        logger.info("Load test completed.");
     }
+
+    private JsonObject loadJsonDataFromFile(String jsonFilePathForThread) {
+        logger.info("Loading JSON data from file: {}", jsonFilePathForThread);
+        try {
+            return JsonFileReaderUtils.readJsonFromFile(jsonFilePathForThread);
+        } catch (IOException e) {
+            logger.error("Failed to read JSON data from file: {}", jsonFilePathForThread, e);
+            return null;
+        }
+    }
+
 
     /**
      * Executes the operations for a specific thread.

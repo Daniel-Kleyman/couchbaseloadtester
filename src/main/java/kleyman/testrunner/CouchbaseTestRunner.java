@@ -22,7 +22,7 @@ public class CouchbaseTestRunner implements TestRunner {
         runThreadPoolTest();
         runConnectionPoolTest();
 
-        logger.info("All load tests completed. " + numberOfTestRun);
+        logger.info("All {} load tests completed.", numberOfTestRun);
     }
 
     private void runConnectionPoolTest() {

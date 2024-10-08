@@ -51,6 +51,11 @@ public class CouchbaseLoadTestScenarioProvider {
                 new CouchbaseLoadTestExecutor(15, jsonSmallPath, false, couchbaseService)
         );
         logger.info("Created {} load test scenarios.", scenarios.size());
+        List<CouchbaseLoadTestExecutor> scenarios1 = List.of(
+                new CouchbaseLoadTestExecutor(5, jsonBigPath, true, couchbaseService),
+                new CouchbaseLoadTestExecutor(5, jsonSmallPath, true, couchbaseService)
+
+        );
         return scenarios;
     }
 
