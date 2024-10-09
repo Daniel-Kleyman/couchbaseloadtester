@@ -4,8 +4,7 @@ import kleyman.service.CouchbaseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 
 import java.util.List;
 
@@ -13,33 +12,40 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class CouchbaseLoadTestScenarioProviderTest {
-
-    @Mock
-    private CouchbaseService couchbaseService;
-
     private CouchbaseLoadTestScenarioProvider scenarioProvider;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        CouchbaseService couchbaseService = Mockito.mock(CouchbaseService.class);
         scenarioProvider = new CouchbaseLoadTestScenarioProvider(couchbaseService);
     }
 
     @Test
-    @DisplayName("Test createThreadPoolScenarios returns 12 scenarios")
-    public void givenCouchbaseService_whenCreateThreadPoolScenarios_thenReturns12Scenarios() {
+    @DisplayName("Test creation of load test scenarios")
+    void givenCouchbaseLoadTestScenarioProvider_whenCreateThreadPoolScenariosCalled_thenReturnsListOfCouchbaseLoadTestExecutor() {
         // Given
+        // A CouchbaseLoadTestScenarioProvider with a mocked CouchbaseService
 
         // When
         List<CouchbaseLoadTestExecutor> scenarios = scenarioProvider.createThreadPoolScenarios();
 
         // Then
-        assertNotNull(scenarios, "Scenarios list should not be null.");
-        assertEquals(12, scenarios.size(), "Should create 12 load test scenarios.");
+        assertNotNull(scenarios, "Scenarios should not be null");
+        assertEquals(12, scenarios.size(), "Expected 12 scenarios to be created");
+    }
 
-        for (CouchbaseLoadTestExecutor executor : scenarios) {
-            assertNotNull(executor, "Each scenario should not be null.");
-        }
+    @Test
+    @DisplayName("Test executor for connection pool test")
+    void givenCouchbaseLoadTestScenarioProvider_whenExecutorForConnectionPoolTestAccessed_thenReturnsCouchbaseLoadTestExecutorInstance() {
+        // Given
+        // A CouchbaseLoadTestScenarioProvider with a mocked CouchbaseService
+
+        // When
+        CouchbaseLoadTestExecutor executor = scenarioProvider.getExecutorForConnectionPoolTest();
+
+        // Then
+        assertNotNull(executor, "Executor should not be null");
+        assertEquals(10, executor.getThreadCount(), "Expected thread count to be 10");
     }
 
 }

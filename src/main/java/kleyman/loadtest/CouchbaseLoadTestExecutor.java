@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * Couchbase implementation of the LoadTestExecutor interface for conducting load tests.
  */
 public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
-    private static final Logger logger = LoggerFactory.getLogger(CouchbaseLoadTestExecutor.class); // Logger instance
+    private static final Logger logger = LoggerFactory.getLogger(CouchbaseLoadTestExecutor.class);
     @Getter
     private final int threadCount;
     @Getter
@@ -39,7 +39,7 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
         this.jsonFilePath = jsonFilePath;
         this.useUniqueKeys = useUniqueKeys;
         this.couchbaseService = couchbaseService;
-        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "180000"));
+        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "500"));
     }
 
     /**
@@ -99,7 +99,7 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
         logger.info("Thread {} completed operations.", threadId);
     }
 
-    private String createKeyKey(int threadId) {
+    String createKeyKey(int threadId) {
         return useUniqueKeys ? "user::" + threadId + "::" + System.nanoTime() : "user::shared";
     }
 

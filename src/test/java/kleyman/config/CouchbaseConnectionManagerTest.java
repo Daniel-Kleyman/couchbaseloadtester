@@ -1,10 +1,9 @@
-package kleyman.database;
+package kleyman.config;
 
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.kv.MutationResult;
 import com.couchbase.client.java.kv.GetResult;
-import kleyman.config.CouchbaseConnectionManager;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
