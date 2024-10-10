@@ -41,11 +41,11 @@ class CouchbaseLoadTestScenarioProviderTest {
         // A CouchbaseLoadTestScenarioProvider with a mocked CouchbaseService
 
         // When
-        CouchbaseLoadTestExecutor executor = scenarioProvider.getExecutorForConnectionPoolTest();
+        List<CouchbaseLoadTestExecutor> scenarios = scenarioProvider.createConnectionPoolScenarios();
 
         // Then
-        assertNotNull(executor, "Executor should not be null");
-        assertEquals(10, executor.getThreadCount(), "Expected thread count to be 10");
+        assertNotNull(scenarios, "Scenarios should not be null");
+        assertEquals(3, scenarios.size(), "Expected 3 scenarios to be created");
     }
 
 }

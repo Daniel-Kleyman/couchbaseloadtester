@@ -3,6 +3,8 @@ package kleyman.it;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.java.json.JsonObject;
 import kleyman.config.CouchbaseConnectionManager;
+import kleyman.metrics.CouchbaseMetrics;
+import kleyman.metrics.MetricsSetup;
 import kleyman.service.CouchbaseService;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,6 +17,8 @@ class CouchbaseServiceIntegrationTest {
 
     private static CouchbaseConnectionManager connectionManager;
     private static CouchbaseService couchbaseService;
+    private final CouchbaseMetrics couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getRegistry(), " ");
+
 
     @BeforeAll
     static void setUp() {
@@ -31,8 +35,8 @@ class CouchbaseServiceIntegrationTest {
         JsonObject jsonData = JsonObject.create().put("name", "Integration Test");
 
         // When
-        couchbaseService.upload(key, jsonData);
-        JsonObject retrievedData = couchbaseService.retrieve(key);
+        couchbaseService.upload(key, jsonData, couchbaseMetrics);
+        JsonObject retrievedData = couchbaseService.retrieve(key, couchbaseMetrics);
 
         // Then
         assertNotNull(retrievedData);
@@ -45,10 +49,10 @@ class CouchbaseServiceIntegrationTest {
         // Given
         String key = "test-retrieve-doc";
         JsonObject jsonData = JsonObject.create().put("name", "Integration Test");
-        couchbaseService.upload(key, jsonData);
+        couchbaseService.upload(key, jsonData, couchbaseMetrics);
 
         // When
-        JsonObject retrievedData = couchbaseService.retrieve(key);
+        JsonObject retrievedData = couchbaseService.retrieve(key, couchbaseMetrics);
 
         // Then
         assertNotNull(retrievedData);
@@ -64,7 +68,7 @@ class CouchbaseServiceIntegrationTest {
 
         // When & Then
         Exception exception = assertThrows(Exception.class, () -> {
-            couchbaseService.upload(invalidKey, jsonData);
+            couchbaseService.upload(invalidKey, jsonData, couchbaseMetrics);
         });
 
         assertInstanceOf(CouchbaseException.class, exception);
@@ -78,7 +82,7 @@ class CouchbaseServiceIntegrationTest {
 
         // When & Then
         Exception exception = assertThrows(Exception.class, () -> {
-            couchbaseService.retrieve(key);
+            couchbaseService.retrieve(key, couchbaseMetrics);
         });
 
         assertInstanceOf(CouchbaseException.class, exception, "Expected CouchbaseException to be thrown");

@@ -1,5 +1,6 @@
 package kleyman.testrunner;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import kleyman.config.CouchbaseConnectionManager;
 import kleyman.loadtest.CouchbaseLoadTestScenarioProvider;
 import kleyman.loadtest.CouchbaseLoadTestExecutor;
@@ -19,20 +20,21 @@ public class CouchbaseTestRunner implements TestRunner {
     @Override
     public void runTests() {
         logger.info("Starting Couchbase Load Tests");
-        runThreadPoolTest();
-      //  runConnectionPoolTest();
+       // runThreadPoolTest();
+        runConnectionPoolTest();
 
         logger.info("All {} load tests completed.", numberOfTestRun);
     }
 
     private void runConnectionPoolTest() {
 
-        for (Integer connectionPoolSize : CouchbaseLoadTestScenarioProvider.connectionPoolSize) {
+        for (int i = 0; i < CouchbaseLoadTestScenarioProvider.connectionPoolSize.size(); i++) {
+            int connectionPoolSize = CouchbaseLoadTestScenarioProvider.connectionPoolSize.get(i);
             try (CouchbaseConnectionManager connectionManager = createConnectionManager(connectionPoolSize)) {
                 if (initializeCouchbaseBucket(connectionManager)) {
                     CouchbaseService couchbaseService = new CouchbaseService(connectionManager);
                     CouchbaseLoadTestScenarioProvider scenarioProvider = new CouchbaseLoadTestScenarioProvider(couchbaseService);
-                    CouchbaseLoadTestExecutor connectionPoolTestExecutor = scenarioProvider.getExecutorForConnectionPoolTest();
+                    CouchbaseLoadTestExecutor connectionPoolTestExecutor = scenarioProvider.createConnectionPoolScenarios().get(i);
                     executeSingleLoadTest(connectionPoolTestExecutor);
                 }
             } catch (Exception e) {

@@ -17,7 +17,7 @@ class CouchbaseLoadTestExecutorTest {
     @BeforeEach
     void setUp() {
         couchbaseService = mock(CouchbaseService.class);
-        loadTestExecutor = new CouchbaseLoadTestExecutor(5, "path/to/json", true, couchbaseService);
+        loadTestExecutor = new CouchbaseLoadTestExecutor(5, "path/to/json", true, couchbaseService, "scenario12");
     }
 
     @Test
@@ -53,7 +53,7 @@ class CouchbaseLoadTestExecutorTest {
     void GivenSharedKeySetting_WhenCreatingKeys_ThenReturnsSharedKey() {
         // Given
         int threadId = 1;
-        loadTestExecutor = new CouchbaseLoadTestExecutor(5, "path/to/json", false, couchbaseService);
+        loadTestExecutor = new CouchbaseLoadTestExecutor(5, "path/to/json", false, couchbaseService, "scenario12");
 
         // When
         String key = loadTestExecutor.createKeyKey(threadId);

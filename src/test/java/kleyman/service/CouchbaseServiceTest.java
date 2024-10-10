@@ -4,6 +4,8 @@ import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
 import kleyman.config.CouchbaseConnectionManager;
+import kleyman.metrics.CouchbaseMetrics;
+import kleyman.metrics.MetricsSetup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,7 @@ public class CouchbaseServiceTest {
     private static final String NON_EXISTENT_KEY = "nonExistentKey";
     private static final String CONNECTION_FAILED_MESSAGE = "Connection failed";
     private static final String UNEXPECTED_ERROR_MESSAGE = "Unexpected error";
-
+    private final CouchbaseMetrics couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getRegistry(), " ");
     private CouchbaseConnectionManager connectionManager;
     private CouchbaseService couchbaseService;
     private JsonObject jsonData;
@@ -28,6 +30,7 @@ public class CouchbaseServiceTest {
         connectionManager = Mockito.mock(CouchbaseConnectionManager.class);
         couchbaseService = new CouchbaseService(connectionManager);
         jsonData = JsonObject.create().put("field", "value");
+
     }
 
     private com.couchbase.client.java.Collection createMockCollection() {
@@ -42,7 +45,7 @@ public class CouchbaseServiceTest {
         when(connectionManager.getCollection()).thenReturn(mockCollection);
 
         // When
-        couchbaseService.upload(TEST_KEY, jsonData);
+        couchbaseService.upload(TEST_KEY, jsonData, couchbaseMetrics);
 
         // Then
         verify(mockCollection, times(1)).upsert(TEST_KEY, jsonData);
@@ -58,7 +61,7 @@ public class CouchbaseServiceTest {
 
         // When
         CouchbaseException thrownException = assertThrows(CouchbaseException.class, () -> {
-            couchbaseService.upload(TEST_KEY, jsonData);
+            couchbaseService.upload(TEST_KEY, jsonData, couchbaseMetrics);
         });
 
         // Then
@@ -75,7 +78,7 @@ public class CouchbaseServiceTest {
 
         // When
         RuntimeException thrownException = assertThrows(RuntimeException.class, () -> {
-            couchbaseService.upload(TEST_KEY, jsonData);
+            couchbaseService.upload(TEST_KEY, jsonData, couchbaseMetrics);
         });
 
         // Then
@@ -96,7 +99,7 @@ public class CouchbaseServiceTest {
         when(mockGetResult.contentAs(JsonObject.class)).thenReturn(expectedJson);
 
         // When
-        JsonObject actualJson = couchbaseService.retrieve(TEST_KEY);
+        JsonObject actualJson = couchbaseService.retrieve(TEST_KEY, couchbaseMetrics);
 
         // Then
         assertEquals(expectedJson, actualJson);
@@ -113,7 +116,7 @@ public class CouchbaseServiceTest {
 
         // When
         CouchbaseException thrownException = assertThrows(CouchbaseException.class, () -> {
-            couchbaseService.retrieve(NON_EXISTENT_KEY);
+            couchbaseService.retrieve(NON_EXISTENT_KEY, couchbaseMetrics);
         });
 
         // Then
@@ -130,7 +133,7 @@ public class CouchbaseServiceTest {
 
         // When
         RuntimeException thrownException = assertThrows(RuntimeException.class, () -> {
-            couchbaseService.retrieve(TEST_KEY);
+            couchbaseService.retrieve(TEST_KEY, couchbaseMetrics);
         });
 
         // Then
@@ -151,7 +154,7 @@ public class CouchbaseServiceTest {
         when(mockGetResult.contentAs(JsonObject.class)).thenReturn(expectedJson);
 
         // When
-        couchbaseService.retrieveJsonThreeTimes(TEST_KEY);
+        couchbaseService.retrieveJsonThreeTimes(TEST_KEY, couchbaseMetrics);
 
         // Then
         verify(mockCollection, times(3)).get(TEST_KEY);
@@ -167,7 +170,7 @@ public class CouchbaseServiceTest {
 
         // When & Then
         CouchbaseException thrownException = assertThrows(CouchbaseException.class, () -> {
-            couchbaseService.retrieveJsonThreeTimes(TEST_KEY);
+            couchbaseService.retrieveJsonThreeTimes(TEST_KEY, couchbaseMetrics);
         });
 
         assertEquals(CONNECTION_FAILED_MESSAGE, thrownException.getMessage());
@@ -184,7 +187,7 @@ public class CouchbaseServiceTest {
 
         // When & Then
         RuntimeException thrownException = assertThrows(RuntimeException.class, () -> {
-            couchbaseService.retrieveJsonThreeTimes(TEST_KEY);
+            couchbaseService.retrieveJsonThreeTimes(TEST_KEY, couchbaseMetrics);
         });
 
         assertEquals("Unexpected error retrieving document with key: " + TEST_KEY, thrownException.getMessage());

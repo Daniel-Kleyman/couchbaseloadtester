@@ -1,5 +1,7 @@
 package kleyman.service;
 
+import kleyman.metrics.CouchbaseMetrics;
+
 /**
  * Interface for database services.
  */
@@ -11,7 +13,7 @@ public interface DataBaseService<T> {
      * @param key  the key under which to store the object
      * @param data the object to insert
      */
-    void upload(String key, T data);
+    void upload(String key, T data, CouchbaseMetrics couchbaseMetrics);
 
     /**
      * Retrieves an object from the database by key.
@@ -19,5 +21,5 @@ public interface DataBaseService<T> {
      * @param key the key of the object to retrieve
      * @return the retrieved object
      */
-    T retrieve(String key);
+    T retrieve(String key, CouchbaseMetrics couchbaseMetrics);
 }

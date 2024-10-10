@@ -2,6 +2,8 @@ package kleyman.loadtest;
 
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.java.json.JsonObject;
+import kleyman.metrics.CouchbaseMetrics;
+import kleyman.metrics.MetricsSetup;
 import kleyman.service.CouchbaseService;
 import kleyman.util.JsonFileReaderUtils;
 import lombok.Getter;
@@ -25,6 +27,7 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
     private final String jsonFilePath;
     private final long testDurationMillis;
     private final CouchbaseService couchbaseService;
+    private final CouchbaseMetrics couchbaseMetrics;
 
     /**
      * Constructs a CouchbaseTestScenario for running load tests.
@@ -33,13 +36,15 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
      * @param jsonFilePath     file path to the JSON data
      * @param useUniqueKeys    whether to use unique keys for each operation
      * @param couchbaseService the service to interact with the Couchbase database
+     * @param scenarioId       scenario id
      */
-    public CouchbaseLoadTestExecutor(int threadCount, String jsonFilePath, boolean useUniqueKeys, CouchbaseService couchbaseService) {
+    public CouchbaseLoadTestExecutor(int threadCount, String jsonFilePath, boolean useUniqueKeys, CouchbaseService couchbaseService, String scenarioId) {
         this.threadCount = threadCount;
         this.jsonFilePath = jsonFilePath;
         this.useUniqueKeys = useUniqueKeys;
         this.couchbaseService = couchbaseService;
         this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "500"));
+        this.couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getRegistry(), scenarioId);
     }
 
     /**
@@ -71,8 +76,6 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
             return null;
         }
     }
-
-
     /**
      * Executes the operations for a specific thread.
      * Each thread uploads data to the Couchbase database and retrieves it multiple times within the test duration.
@@ -86,9 +89,9 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
         while (System.currentTimeMillis() - startTime <= testDurationMillis) {
             String key = createKeyKey(threadId);
             try {
-                couchbaseService.upload(key, jsonData);
+                couchbaseService.upload(key, jsonData, couchbaseMetrics);
                 logger.debug("Thread {}: Uploaded data for key: {}", threadId, key);
-                couchbaseService.retrieveJsonThreeTimes(key);
+                couchbaseService.retrieveJsonThreeTimes(key, couchbaseMetrics);
                 logger.debug("Thread {}: Uploaded and retrieved data for key: {}", threadId, key);
             } catch (CouchbaseException e) {
                 logger.error("Thread {}: Couchbase error during operations for key: {}", threadId, key, e);
