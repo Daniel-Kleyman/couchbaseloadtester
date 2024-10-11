@@ -1,9 +1,9 @@
 package kleyman.metrics;
 
-import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.Counter;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +14,11 @@ import java.util.concurrent.TimeUnit;
  * This class manages metrics for PUT and GET operations using Micrometer,
  * including counters for success and failure rates, and timers for operation latencies.
  *
- * <p>It provides methods to increment counters and record latencies for
- * performance monitoring and analysis.</p>
+ * <p>It provides methods to increment counters, record latencies, and calculate metrics
+ * such as average latency, transactions per second, error rates, and maximum latencies
+ * for performance monitoring and analysis.</p>
  */
+@Getter
 public class CouchbaseMetrics {
 
     private static final Logger logger = LoggerFactory.getLogger(CouchbaseMetrics.class);
@@ -30,7 +32,6 @@ public class CouchbaseMetrics {
     public CouchbaseMetrics(MeterRegistry meterRegistry, String scenarioId) {
         logger.info("Starting collection of metrics");
 
-        // Initialize counters
         putSuccessCounter = Counter.builder("couchbase.put.success")
                 .description("Count of successful PUT operations")
                 .tag("scenario", scenarioId)
@@ -60,82 +61,7 @@ public class CouchbaseMetrics {
                 .description("Latency of GET operations")
                 .tag("scenario", scenarioId)
                 .register(meterRegistry);
-
-        Gauge.builder("couchbase.put.average_latency", () -> {
-                    double totalPutResponseTime = putTimer.totalTime(TimeUnit.MILLISECONDS);
-                    double successfulPutCount = putSuccessCounter.count();
-                    double averageLatency = successfulPutCount == 0 ? 0 : (totalPutResponseTime / successfulPutCount);
-                    return Math.round(averageLatency * 10.0) / 10.0;
-                })
-                .description("Average latency of PUT operations in milliseconds")
-                .tag("scenario", scenarioId)
-                .register(meterRegistry);
-
-        Gauge.builder("couchbase.get.average_latency", () -> {
-                    double totalGetResponseTime = getTimer.totalTime(TimeUnit.MILLISECONDS);
-                    double successfulGetCount = getSuccessCounter.count();
-                    double averageLatency = successfulGetCount == 0 ? 0 : (totalGetResponseTime / successfulGetCount);
-                    return Math.round(averageLatency * 10.0) / 10.0;
-                })
-                .description("Average latency of GET operations in milliseconds")
-                .tag("scenario", scenarioId)
-                .register(meterRegistry);
-
-        Gauge.builder("couchbase.average_response_time", () -> {
-                    double totalResponseTime = putTimer.totalTime(TimeUnit.MILLISECONDS) + getTimer.totalTime(TimeUnit.MILLISECONDS);
-                    double totalSuccessCount = putSuccessCounter.count() + getSuccessCounter.count();
-                    double averageResponseTime = totalSuccessCount == 0 ? 0 : (totalResponseTime / totalSuccessCount);
-                    return Math.round(averageResponseTime * 10.0) / 10.0;
-                })
-                .description("Overall average response time for PUT and GET operations in milliseconds")
-                .tag("scenario", scenarioId)
-                .register(meterRegistry);
-
-        Gauge.builder("couchbase.transactions_per_second (TPS)", () -> {
-                    double totalSuccessfulTransactions = putSuccessCounter.count() + getSuccessCounter.count();
-                    double totalOperationTime = putTimer.totalTime(TimeUnit.MILLISECONDS) + getTimer.totalTime(TimeUnit.MILLISECONDS);
-                    return totalOperationTime == 0 ? 0 : Math.round((totalSuccessfulTransactions / (totalOperationTime / 1000.0)) * 10.0) / 10.0;
-                })
-                .description("Total successful transactions processed per second (PUT + GET)")
-                .tag("scenario", scenarioId)
-                .register(meterRegistry);
-
-        Gauge.builder("couchbase.total_error_rate", () -> {
-                    double totalSuccessfulTransactions = putSuccessCounter.count() + getSuccessCounter.count();
-                    double totalFailedTransactions = putFailureCounter.count() + getFailureCounter.count();
-                    double totalTransactions = totalSuccessfulTransactions + totalFailedTransactions;
-
-                    return totalTransactions == 0 ? 0 : (totalFailedTransactions / totalTransactions) * 100;
-                })
-                .description("Total error rate for PUT and GET operations in percentage")
-                .tag("scenario", scenarioId)
-                .register(meterRegistry);
-
-        Gauge.builder("couchbase.put.max_latency", () -> {
-                    double currentMaxPutLatency = putTimer.totalTime(TimeUnit.MILLISECONDS);
-                    return currentMaxPutLatency == 0 ? 0 : Math.round(currentMaxPutLatency);
-                })
-                .description("Maximum latency of PUT operations in milliseconds")
-                .tag("scenario", scenarioId)
-                .register(meterRegistry);
-        Gauge.builder("couchbase.get.max_latency", () -> {
-                    double currentMaxGetLatency = getTimer.totalTime(TimeUnit.MILLISECONDS);
-                    return currentMaxGetLatency == 0 ? 0 : Math.round(currentMaxGetLatency);
-                })
-                .description("Maximum latency of GET operations in milliseconds")
-                .tag("scenario", scenarioId)
-                .register(meterRegistry);
-
-        Gauge.builder("couchbase.total_successful_operations", () -> {
-                    double totalSuccessfulPut = putSuccessCounter.count();
-                    double totalSuccessfulGet = getSuccessCounter.count();
-                    return totalSuccessfulPut + totalSuccessfulGet;
-                })
-                .description("Total number of successful PUT and GET operations executed")
-                .tag("scenario", scenarioId)
-                .register(meterRegistry);
     }
-
 
     public void incrementPutSuccess() {
         putSuccessCounter.increment();
@@ -159,5 +85,53 @@ public class CouchbaseMetrics {
 
     public void recordGetLatency(long duration, TimeUnit unit) {
         getTimer.record(duration, unit);
+    }
+
+    public double getAveragePutLatency() {
+        double totalPutResponseTime = putTimer.totalTime(TimeUnit.MILLISECONDS);
+        double successfulPutCount = putSuccessCounter.count();
+        return successfulPutCount == 0 ? 0 : Math.round((totalPutResponseTime / successfulPutCount) * 10.0) / 10.0;
+    }
+
+    public double getAverageGetLatency() {
+        double totalGetResponseTime = getTimer.totalTime(TimeUnit.MILLISECONDS);
+        double successfulGetCount = getSuccessCounter.count();
+        return successfulGetCount == 0 ? 0 : Math.round((totalGetResponseTime / successfulGetCount) * 10.0) / 10.0;
+    }
+
+    public double getTotalAverageResponseTime() {
+        double totalResponseTime = putTimer.totalTime(TimeUnit.MILLISECONDS) + getTimer.totalTime(TimeUnit.MILLISECONDS);
+        double totalSuccessfulCount = putSuccessCounter.count() + getSuccessCounter.count();
+        return totalSuccessfulCount == 0 ? 0 : Math.round((totalResponseTime / totalSuccessfulCount) * 10.0) / 10.0;
+    }
+
+    public double getTransactionsPerSecond() {
+        double totalSuccessfulTransactions = putSuccessCounter.count() + getSuccessCounter.count();
+        double totalOperationTime = putTimer.totalTime(TimeUnit.MILLISECONDS) + getTimer.totalTime(TimeUnit.MILLISECONDS);
+        return totalOperationTime == 0 ? 0 : Math.round((totalSuccessfulTransactions / (totalOperationTime / 1000.0)) * 10.0) / 10.0;
+    }
+
+    public double getTotalErrorRate() {
+        double totalSuccessfulTransactions = putSuccessCounter.count() + getSuccessCounter.count();
+        double totalFailedTransactions = putFailureCounter.count() + getFailureCounter.count();
+        double totalTransactions = totalSuccessfulTransactions + totalFailedTransactions;
+
+        return totalTransactions == 0 ? 0 : (totalFailedTransactions / totalTransactions) * 100;
+    }
+
+    public double getMaxPutLatency() {
+        double currentMaxPutLatency = putTimer.max(TimeUnit.MILLISECONDS);
+        return currentMaxPutLatency == 0 ? 0 : Math.round(currentMaxPutLatency);
+    }
+
+    public double getMaxGetLatency() {
+        double currentMaxGetLatency = getTimer.max(TimeUnit.MILLISECONDS);
+        return currentMaxGetLatency == 0 ? 0 : Math.round(currentMaxGetLatency);
+    }
+
+    public double getTotalSuccessfulOperations() {
+        double totalSuccessfulPut = putSuccessCounter.count();
+        double totalSuccessfulGet = getSuccessCounter.count();
+        return totalSuccessfulPut + totalSuccessfulGet;
     }
 }

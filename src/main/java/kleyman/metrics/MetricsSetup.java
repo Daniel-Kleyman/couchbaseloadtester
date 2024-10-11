@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpServer;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.micrometer.prometheus.PrometheusConfig;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import java.net.InetSocketAddress;
  * Provides a /metrics endpoint to expose application metrics.
  */
 public class MetricsSetup {
+    @Getter
     private static final PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
     private static final Logger logger = LoggerFactory.getLogger(MetricsSetup.class.getName());
     private static HttpServer server;
@@ -53,8 +55,8 @@ public class MetricsSetup {
         }
     }
 
-    public static MeterRegistry getRegistry() {
-        return prometheusRegistry;
-    }
+   // public static MeterRegistry getRegistry() {
+//        return prometheusRegistry;
+//    }
 }
 

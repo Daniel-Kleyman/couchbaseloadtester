@@ -17,7 +17,7 @@ class CouchbaseServiceIntegrationTest {
 
     private static CouchbaseConnectionManager connectionManager;
     private static CouchbaseService couchbaseService;
-    private final CouchbaseMetrics couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getRegistry(), " ");
+    private final CouchbaseMetrics couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getPrometheusRegistry(), " ");
 
 
     @BeforeAll

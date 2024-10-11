@@ -32,7 +32,7 @@ public class CouchbaseService implements DataBaseService<JsonObject> {
         long startTime = System.nanoTime();
         try {
             connectionManager.getCollection().upsert(key, jsonData);
-            logger.info("Successfully inserted JSON document with key: {}", key);
+            logger.debug("Successfully inserted JSON document with key: {}", key);
             couchbaseMetrics.incrementPutSuccess();
         } catch (CouchbaseException e) {
             logger.error("Couchbase error inserting JSON document with key: {}", key, e);
@@ -60,7 +60,7 @@ public class CouchbaseService implements DataBaseService<JsonObject> {
             if (jsonObject == null) {
                 throw new CouchbaseException("Document not found for key: " + key);
             }
-            logger.info("Successfully retrieved JSON document with ID: {}", key);
+            logger.debug("Successfully retrieved JSON document with ID: {}", key);
             couchbaseMetrics.incrementGetSuccess();
             return jsonObject;
         } catch (CouchbaseException e) {

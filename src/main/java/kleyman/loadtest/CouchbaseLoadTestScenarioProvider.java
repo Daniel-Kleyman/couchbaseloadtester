@@ -19,7 +19,6 @@ public class CouchbaseLoadTestScenarioProvider {
     private final String jsonSmallPath = EnvironmentVariableUtils.getEnv("JSON_SMALL_PATH");
     // Define a constant list of connection pool sizes to test different configurations
     public static final List<Integer> connectionPoolSize = List.of(5, 10, 15);
-    int scenarioId;
 
     public CouchbaseLoadTestScenarioProvider(CouchbaseService couchbaseService) {
         this.couchbaseService = couchbaseService;
@@ -31,7 +30,7 @@ public class CouchbaseLoadTestScenarioProvider {
      * @return a list of CouchbaseLoadTestExecutor scenarios
      */
     public List<CouchbaseLoadTestExecutor> createThreadPoolScenarios() {
-        logger.info("Creating Couchbase load test scenarios.");
+        logger.info("Creating Couchbase load test thread pool scenarios.");
         // Defines scenarios with 5, 10, or 15 threads, using either big or small JSON data, and using unique or shared keys for each operation.
         List<CouchbaseLoadTestExecutor> scenarios = List.of(
                 new CouchbaseLoadTestExecutor(5, jsonBigPath, true, couchbaseService, "scenario1"),
@@ -47,23 +46,17 @@ public class CouchbaseLoadTestScenarioProvider {
                 new CouchbaseLoadTestExecutor(15, jsonSmallPath, true, couchbaseService, "scenario11"),
                 new CouchbaseLoadTestExecutor(15, jsonSmallPath, false, couchbaseService, "scenario12")
         );
-        logger.info("Created {} load test scenarios.", scenarios.size());
-        scenarioId = scenarios.size();
-        List<CouchbaseLoadTestExecutor> scenarios1 = List.of(
-                new CouchbaseLoadTestExecutor(5, jsonBigPath, true, couchbaseService, "scenario111"),
-                new CouchbaseLoadTestExecutor(5, jsonSmallPath, true, couchbaseService, "scenario112")
-
-        );
-        return scenarios1;
+        logger.info("Created {} thread pool load test scenarios.", scenarios.size());
+        return scenarios;
     }
 
     public List<CouchbaseLoadTestExecutor> createConnectionPoolScenarios() {
-        List<CouchbaseLoadTestExecutor> scenarios = new ArrayList<>();
-        for (int i = 0; i < connectionPoolSize.size(); i++) {
-            scenarioId++;
-            scenarios.add(new CouchbaseLoadTestExecutor(10, jsonBigPath, true, couchbaseService, "scenario" + scenarioId));
-        }
-
+        logger.info("Creating Couchbase load test connection pool scenarios.");
+        List<CouchbaseLoadTestExecutor> scenarios = List.of(
+                new CouchbaseLoadTestExecutor(10, jsonBigPath, true, couchbaseService, "scenario13"),
+                new CouchbaseLoadTestExecutor(10, jsonBigPath, true, couchbaseService, "scenario14"),
+                new CouchbaseLoadTestExecutor(10, jsonBigPath, true, couchbaseService, "scenario15"));
+        logger.info("Created {} connection pool load test scenarios.", scenarios.size());
         return scenarios;
     }
 

@@ -20,7 +20,7 @@ public class CouchbaseTestRunner implements TestRunner {
     @Override
     public void runTests() {
         logger.info("Starting Couchbase Load Tests");
-       // runThreadPoolTest();
+        //runThreadPoolTest();
         runConnectionPoolTest();
 
         logger.info("All {} load tests completed.", numberOfTestRun);

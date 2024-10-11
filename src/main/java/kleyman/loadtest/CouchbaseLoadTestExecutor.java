@@ -3,6 +3,7 @@ package kleyman.loadtest;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.java.json.JsonObject;
 import kleyman.metrics.CouchbaseMetrics;
+import kleyman.metrics.MetricManager;
 import kleyman.metrics.MetricsSetup;
 import kleyman.service.CouchbaseService;
 import kleyman.util.JsonFileReaderUtils;
@@ -28,6 +29,7 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
     private final long testDurationMillis;
     private final CouchbaseService couchbaseService;
     private final CouchbaseMetrics couchbaseMetrics;
+    private final String scenarioId;
 
     /**
      * Constructs a CouchbaseTestScenario for running load tests.
@@ -43,8 +45,9 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
         this.jsonFilePath = jsonFilePath;
         this.useUniqueKeys = useUniqueKeys;
         this.couchbaseService = couchbaseService;
-        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "1500"));
-        this.couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getRegistry(), scenarioId);
+        this.scenarioId = scenarioId;
+        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "500"));
+        this.couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getPrometheusRegistry(), scenarioId);
     }
 
     /**
@@ -55,7 +58,7 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
 
     @Override
     public void executeLoadTest() {
-        logger.info("Starting load test with {} threads using unique keys: {}", threadCount, useUniqueKeys);
+        logger.info("Starting load test with {} threads using unique keys: {} by {}", threadCount, useUniqueKeys, scenarioId);
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         for (int i = 1; i <= threadCount; i++) {
             JsonObject jsonData = loadJsonDataFromFile(jsonFilePath + i + ".json");
@@ -65,6 +68,8 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
         }
         shutdownExecutor(executor);
         logger.info("Load test completed.");
+        //Saves scenario's metrics
+        MetricManager.metricsMap.put(scenarioId, couchbaseMetrics);
     }
 
     private JsonObject loadJsonDataFromFile(String jsonFilePathForThread) {

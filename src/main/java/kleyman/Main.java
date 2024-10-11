@@ -22,6 +22,7 @@ public class Main {
         } catch (Exception e) {
             logger.error("Error during test execution: {}", e.getMessage(), e);
         } finally {
+           // MetricsSetup.stopMetricsServer();
             logger.info("Metrics reporting stopped.");
         }
     }
