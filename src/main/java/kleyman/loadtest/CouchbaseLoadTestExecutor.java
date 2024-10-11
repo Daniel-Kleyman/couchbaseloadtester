@@ -43,7 +43,7 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
         this.jsonFilePath = jsonFilePath;
         this.useUniqueKeys = useUniqueKeys;
         this.couchbaseService = couchbaseService;
-        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "500"));
+        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "1500"));
         this.couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getRegistry(), scenarioId);
     }
 
@@ -76,6 +76,7 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
             return null;
         }
     }
+
     /**
      * Executes the operations for a specific thread.
      * Each thread uploads data to the Couchbase database and retrieves it multiple times within the test duration.

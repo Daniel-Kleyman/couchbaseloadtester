@@ -60,9 +60,7 @@ public class CouchbaseServiceTest {
         when(mockCollection.upsert(anyString(), any())).thenThrow(new CouchbaseException(CONNECTION_FAILED_MESSAGE));
 
         // When
-        CouchbaseException thrownException = assertThrows(CouchbaseException.class, () -> {
-            couchbaseService.upload(TEST_KEY, jsonData, couchbaseMetrics);
-        });
+        CouchbaseException thrownException = assertThrows(CouchbaseException.class, () -> couchbaseService.upload(TEST_KEY, jsonData, couchbaseMetrics));
 
         // Then
         assertEquals(CONNECTION_FAILED_MESSAGE, thrownException.getMessage());
