@@ -1,7 +1,6 @@
 package kleyman.metrics;
 
 import com.sun.net.httpserver.HttpServer;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.micrometer.prometheus.PrometheusConfig;
 import lombok.Getter;
@@ -54,9 +53,5 @@ public class MetricsSetup {
             logger.info("Metrics server stopped.");
         }
     }
-
-   // public static MeterRegistry getRegistry() {
-//        return prometheusRegistry;
-//    }
 }
 

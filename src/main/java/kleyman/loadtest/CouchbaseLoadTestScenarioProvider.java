@@ -1,8 +1,6 @@
 package kleyman.loadtest;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import kleyman.service.CouchbaseService;
 import kleyman.util.EnvironmentVariableUtils;
 import org.slf4j.Logger;
@@ -17,7 +15,6 @@ public class CouchbaseLoadTestScenarioProvider {
     private final CouchbaseService couchbaseService;
     private final String jsonBigPath = EnvironmentVariableUtils.getEnv("JSON_BIG_PATH");
     private final String jsonSmallPath = EnvironmentVariableUtils.getEnv("JSON_SMALL_PATH");
-    // Define a constant list of connection pool sizes to test different configurations
     public static final List<Integer> connectionPoolSize = List.of(5, 10, 15);
 
     public CouchbaseLoadTestScenarioProvider(CouchbaseService couchbaseService) {
@@ -26,12 +23,14 @@ public class CouchbaseLoadTestScenarioProvider {
 
     /**
      * Creates load test scenarios for Couchbase.
+     * Defines scenarios with 5, 10, or 15 threads, using either big or small JSON data,
+     * and using unique or shared keys for each operation.
      *
      * @return a list of CouchbaseLoadTestExecutor scenarios
      */
     public List<CouchbaseLoadTestExecutor> createThreadPoolScenarios() {
         logger.info("Creating Couchbase load test thread pool scenarios.");
-        // Defines scenarios with 5, 10, or 15 threads, using either big or small JSON data, and using unique or shared keys for each operation.
+
         List<CouchbaseLoadTestExecutor> scenarios = List.of(
                 new CouchbaseLoadTestExecutor(5, jsonBigPath, true, couchbaseService, "scenario1"),
                 new CouchbaseLoadTestExecutor(5, jsonBigPath, false, couchbaseService, "scenario2"),
