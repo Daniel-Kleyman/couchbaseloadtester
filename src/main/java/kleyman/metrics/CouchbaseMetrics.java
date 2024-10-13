@@ -99,7 +99,7 @@ public class CouchbaseMetrics {
         return successfulGetCount == 0 ? 0 : Math.round((totalGetResponseTime / successfulGetCount) * 10.0) / 10.0;
     }
 
-    public double getTotalAverageResponseTime() {
+    public double getOverallAverageResponseTime() {
         double totalResponseTime = putTimer.totalTime(TimeUnit.MILLISECONDS) + getTimer.totalTime(TimeUnit.MILLISECONDS);
         double totalSuccessfulCount = putSuccessCounter.count() + getSuccessCounter.count();
         return totalSuccessfulCount == 0 ? 0 : Math.round((totalResponseTime / totalSuccessfulCount) * 10.0) / 10.0;

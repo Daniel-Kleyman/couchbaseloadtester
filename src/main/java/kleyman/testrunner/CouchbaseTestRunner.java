@@ -20,7 +20,7 @@ public class CouchbaseTestRunner implements TestRunner {
     @Override
     public void runTests() {
         logger.info("Starting Couchbase Load Tests");
-        //runThreadPoolTest();
+        runThreadPoolTest();
         runConnectionPoolTest();
 
         logger.info("All {} load tests completed.", numberOfTestRun);
@@ -28,8 +28,8 @@ public class CouchbaseTestRunner implements TestRunner {
 
     private void runConnectionPoolTest() {
 
-        for (int i = 0; i < CouchbaseLoadTestScenarioProvider.connectionPoolSize.size(); i++) {
-            int connectionPoolSize = CouchbaseLoadTestScenarioProvider.connectionPoolSize.get(i);
+        for (int i = 0; i < CouchbaseLoadTestScenarioProvider.CONNECTION_POOL_SIZE.length; i++) {
+            int connectionPoolSize = CouchbaseLoadTestScenarioProvider.CONNECTION_POOL_SIZE[i];
             try (CouchbaseConnectionManager connectionManager = createConnectionManager(connectionPoolSize)) {
                 if (initializeCouchbaseBucket(connectionManager)) {
                     CouchbaseService couchbaseService = new CouchbaseService(connectionManager);

@@ -1,6 +1,5 @@
 package kleyman;
 
-import kleyman.metrics.MetricManager;
 import kleyman.metrics.MetricsSetup;
 import kleyman.report.PPTXReportGenerator;
 import kleyman.testrunner.CouchbaseTestRunner;
@@ -17,14 +16,15 @@ public class Main {
 
     public static void main(String[] args) {
 
-//        try {
-//            MetricsSetup.setupMetrics();
-//            logger.info("Metrics reporting started.");
-//            CouchbaseTestRunner testRunner = new CouchbaseTestRunner();
-//            testRunner.runTests();
-//        } catch (Exception e) {
-//            logger.error("Error during test execution: {}", e.getMessage(), e);
-//        } finally {
+        try {
+            MetricsSetup.setupMetrics();
+            logger.info("Metrics reporting started.");
+            CouchbaseTestRunner testRunner = new CouchbaseTestRunner();
+            testRunner.runTests();
+        } catch (Exception e) {
+            logger.error("Error during test execution: {}", e.getMessage(), e);
+       }
+        //finally {
 //            // MetricsSetup.stopMetricsServer();
 //            logger.info("Metrics reporting stopped.");
 //        }

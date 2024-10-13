@@ -1,6 +1,7 @@
 package kleyman.loadtest;
 
 import java.util.List;
+
 import kleyman.service.CouchbaseService;
 import kleyman.util.EnvironmentVariableUtils;
 import org.slf4j.Logger;
@@ -11,11 +12,13 @@ import org.slf4j.LoggerFactory;
  * This class defines various test scenarios for benchmarking Couchbase's key-value functionality.
  */
 public class CouchbaseLoadTestScenarioProvider {
-    private static final Logger logger = LoggerFactory.getLogger(CouchbaseLoadTestScenarioProvider.class); // Logger instance
+    private static final Logger logger = LoggerFactory.getLogger(CouchbaseLoadTestScenarioProvider.class);
     private final CouchbaseService couchbaseService;
     private final String jsonBigPath = EnvironmentVariableUtils.getEnv("JSON_BIG_PATH");
     private final String jsonSmallPath = EnvironmentVariableUtils.getEnv("JSON_SMALL_PATH");
-    public static final List<Integer> connectionPoolSize = List.of(5, 10, 15);
+    private static final int[] THREAD_COUNTS = {5, 10, 15};
+    public static final int[] CONNECTION_POOL_SIZE = {5, 10, 15};
+    private static final String SCENARIO_PREFIX = "Scenario ";
 
     public CouchbaseLoadTestScenarioProvider(CouchbaseService couchbaseService) {
         this.couchbaseService = couchbaseService;
@@ -32,18 +35,18 @@ public class CouchbaseLoadTestScenarioProvider {
         logger.info("Creating Couchbase load test thread pool scenarios.");
 
         List<CouchbaseLoadTestExecutor> scenarios = List.of(
-                new CouchbaseLoadTestExecutor(5, jsonBigPath, true, couchbaseService, "scenario1"),
-                new CouchbaseLoadTestExecutor(5, jsonBigPath, false, couchbaseService, "scenario2"),
-                new CouchbaseLoadTestExecutor(10, jsonBigPath, true, couchbaseService, "scenario3"),
-                new CouchbaseLoadTestExecutor(10, jsonBigPath, false, couchbaseService, "scenario4"),
-                new CouchbaseLoadTestExecutor(15, jsonBigPath, true, couchbaseService, "scenario5"),
-                new CouchbaseLoadTestExecutor(15, jsonBigPath, false, couchbaseService, "scenario6"),
-                new CouchbaseLoadTestExecutor(5, jsonSmallPath, true, couchbaseService, "scenario7"),
-                new CouchbaseLoadTestExecutor(5, jsonSmallPath, false, couchbaseService, "scenario8"),
-                new CouchbaseLoadTestExecutor(10, jsonSmallPath, true, couchbaseService, "scenario9"),
-                new CouchbaseLoadTestExecutor(10, jsonSmallPath, false, couchbaseService, "scenario10"),
-                new CouchbaseLoadTestExecutor(15, jsonSmallPath, true, couchbaseService, "scenario11"),
-                new CouchbaseLoadTestExecutor(15, jsonSmallPath, false, couchbaseService, "scenario12")
+                createExecutor(THREAD_COUNTS[0], jsonBigPath, true, 1),
+                createExecutor(THREAD_COUNTS[0], jsonBigPath, false, 2),
+                createExecutor(THREAD_COUNTS[1], jsonBigPath, true, 3),
+                createExecutor(THREAD_COUNTS[1], jsonBigPath, false, 4),
+                createExecutor(THREAD_COUNTS[2], jsonBigPath, true, 5),
+                createExecutor(THREAD_COUNTS[2], jsonBigPath, false, 6),
+                createExecutor(THREAD_COUNTS[0], jsonSmallPath, true, 7),
+                createExecutor(THREAD_COUNTS[0], jsonSmallPath, false, 8),
+                createExecutor(THREAD_COUNTS[1], jsonSmallPath, true, 9),
+                createExecutor(THREAD_COUNTS[1], jsonSmallPath, false, 10),
+                createExecutor(THREAD_COUNTS[2], jsonSmallPath, true, 11),
+                createExecutor(THREAD_COUNTS[2], jsonSmallPath, false, 12)
         );
         logger.info("Created {} thread pool load test scenarios.", scenarios.size());
         return scenarios;
@@ -52,11 +55,14 @@ public class CouchbaseLoadTestScenarioProvider {
     public List<CouchbaseLoadTestExecutor> createConnectionPoolScenarios() {
         logger.info("Creating Couchbase load test connection pool scenarios.");
         List<CouchbaseLoadTestExecutor> scenarios = List.of(
-                new CouchbaseLoadTestExecutor(10, jsonBigPath, true, couchbaseService, "scenario13"),
-                new CouchbaseLoadTestExecutor(10, jsonBigPath, true, couchbaseService, "scenario14"),
-                new CouchbaseLoadTestExecutor(10, jsonBigPath, true, couchbaseService, "scenario15"));
+                createExecutor(THREAD_COUNTS[1], jsonBigPath, true, 13),
+                createExecutor(THREAD_COUNTS[1], jsonBigPath, true, 14),
+                createExecutor(THREAD_COUNTS[1], jsonBigPath, true, 15));
         logger.info("Created {} connection pool load test scenarios.", scenarios.size());
         return scenarios;
     }
 
+    private CouchbaseLoadTestExecutor createExecutor(int threadCount, String jsonPath, boolean uniqueKeys, int scenarioNumber) {
+        return new CouchbaseLoadTestExecutor(threadCount, jsonPath, uniqueKeys, couchbaseService, SCENARIO_PREFIX + scenarioNumber);
+    }
 }

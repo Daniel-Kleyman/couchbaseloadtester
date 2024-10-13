@@ -1,10 +1,8 @@
 package kleyman.report;
 
 import kleyman.util.EnvironmentVariableUtils;
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFTextShape;
-import org.apache.poi.xslf.usermodel.XSLFTextRun;
+import org.apache.poi.sl.usermodel.TableCell;
+import org.apache.poi.xslf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +26,14 @@ import java.io.IOException;
  */
 public class PPTXReportGenerator {
     private static final Logger logger = LoggerFactory.getLogger(PPTXReportGenerator.class);
-    private int slideWidth;
+    private static int slideWidth;
     private final String filePath;
+    private final TableSlideGenerator tableSlideGenerator;
+
 
     public PPTXReportGenerator() {
         this.filePath = EnvironmentVariableUtils.getEnv("COUCHBASE_REPORT_PATH");
+        this.tableSlideGenerator = new TableSlideGenerator();
     }
 
     public void createReport() {
@@ -43,6 +44,9 @@ public class PPTXReportGenerator {
             createCouchbaseSetupAndLoadTestingSlide(ppt);
             createTestScenariosSlide(ppt);
             createSpecificScenariosSlide(ppt);
+            createResultsOverviewSlide(ppt);
+            createThreadPoolResultsSlide(ppt);
+            createConnectionPoolResultsSlide(ppt);
             saveReport(ppt);
             logger.info("Report created successfully at {}", filePath);
         } catch (IOException e) {
@@ -57,15 +61,11 @@ public class PPTXReportGenerator {
         logger.debug("Slide dimensions initialized: width = {}, height = {}", slideWidth, slideHeight);
     }
 
-    private void createTitleSlide(XMLSlideShow ppt) {
-        XSLFSlide titleSlide = ppt.createSlide();
-        createTextBox(titleSlide, "Benchmark Report on Couchbase Load Testing", 25.0, Color.BLACK, 50, true);
-        createTextBox(titleSlide, "Performance Evaluation of Key-Value Operations", 20.0, Color.DARK_GRAY, 200, true);
-        createTextBox(titleSlide, "Daniel Kleyman \n   October 2024", 16.0, Color.DARK_GRAY, 350, true);
-        logger.info("Title slide created");
+    public static XSLFSlide initializeXSLFSlide(XMLSlideShow ppt) {
+        return ppt.createSlide();
     }
 
-    private void createTextBox(XSLFSlide slide, String text, double fontSize, Color color, int anchorY, boolean horizontalCentered) {
+    public static void createTextBox(XSLFSlide slide, String text, double fontSize, Color color, int anchorY, boolean horizontalCentered) {
         XSLFTextShape textBox = slide.createTextBox();
         textBox.setAnchor(new java.awt.Rectangle((slideWidth / 2) - 250, anchorY, 500, 50));
         XSLFTextRun textRun = textBox.appendText(text, true);
@@ -75,9 +75,17 @@ public class PPTXReportGenerator {
         logger.debug("Text box created with text: {}", text);
     }
 
+    private void createTitleSlide(XMLSlideShow ppt) {
+        XSLFSlide titleSlide = initializeXSLFSlide(ppt);
+        createTextBox(titleSlide, "Benchmark Report on Couchbase Load Testing", 25.0, Color.BLACK, 50, true);
+        createTextBox(titleSlide, "Performance Evaluation of Key-Value Operations", 20.0, Color.DARK_GRAY, 200, true);
+        createTextBox(titleSlide, "Daniel Kleyman \n   October 2024", 16.0, Color.DARK_GRAY, 350, true);
+        logger.info("Title slide created");
+    }
+
     private void createIntroductionSlide(XMLSlideShow ppt) {
         logger.info("Creating Introduction slide...");
-        XSLFSlide introSlide = ppt.createSlide();
+        XSLFSlide introSlide = initializeXSLFSlide(ppt);
         // Create title
         createTextBox(introSlide, "Introduction", 30.0, Color.BLACK, 50, true);
         // Create purpose section
@@ -85,13 +93,13 @@ public class PPTXReportGenerator {
         createTextBox(introSlide, "This report provides a comprehensive overview of the benchmarking process conducted to evaluate Couchbase's key-value functionality.", 18.0, Color.DARK_GRAY, 140, false);
         // Create objective section
         createTextBox(introSlide, "Objective of Testing:", 20.0, Color.BLACK, 220, true);
-        createTextBox(introSlide, "As part of the selection process for an enterprise caching solution, the objective is to develop a load testing application to benchmark the key-value functionality of Couchbase, a NoSQL database.", 18.0, Color.DARK_GRAY, 250, false);
+        createTextBox(introSlide, "As part of the selection process for an enterprise caching solution, the objective is to develop a load testing strategy to benchmark the key-value functionality of Couchbase.", 18.0, Color.DARK_GRAY, 250, false);
         logger.info("Introduction slide creation complete.");
     }
 
     private void createCouchbaseSetupAndLoadTestingSlide(XMLSlideShow ppt) {
         logger.info("Creating Couchbase Setup And Load Testing slide...");
-        XSLFSlide combinedSlide = ppt.createSlide();
+        XSLFSlide combinedSlide = initializeXSLFSlide(ppt);
         // Create title
         createTextBox(combinedSlide, "Couchbase Setup and Load Testing Methodology", 23.0, Color.BLACK, 10, true);
         // Create Couchbase Setup section
@@ -113,7 +121,7 @@ public class PPTXReportGenerator {
 
     private void createTestScenariosSlide(XMLSlideShow ppt) {
         logger.info("Creating Test Scenarios slide...");
-        XSLFSlide scenariosSlide = ppt.createSlide();
+        XSLFSlide scenariosSlide = initializeXSLFSlide(ppt);
         // Create title with adjusted font and anchor
         createTextBox(scenariosSlide, "Test Scenarios for Couchbase Load Testing", 23.0, Color.BLACK, 10, true);
         // Create Overview section with adjusted font and anchor
@@ -129,7 +137,7 @@ public class PPTXReportGenerator {
     private void createSpecificScenariosSlide(XMLSlideShow ppt) {
         logger.info("Creating Specific Scenarios slide...");
         // Create a new slide for specific scenarios
-        XSLFSlide scenariosSlide = ppt.createSlide();
+        XSLFSlide scenariosSlide = initializeXSLFSlide(ppt);
         // Create title for the scenarios
         createTextBox(scenariosSlide, "Specific Scenarios", 28.0, Color.BLACK, 0, true); // Title size 28
         // Add each scenario with adjusted anchors
@@ -149,6 +157,34 @@ public class PPTXReportGenerator {
         createTextBox(scenariosSlide, "  Scenario 14: 10 threads, 25 kb JSON, unique key, connection pool size 10.", 14.0, Color.DARK_GRAY, 450, false);
         createTextBox(scenariosSlide, "  Scenario 15: 15 threads, 25 kb JSON, unique key, connection pool size 15.", 14.0, Color.DARK_GRAY, 480, false);
         logger.info("Specific Scenarios slide creation complete.");
+    }
+
+    private void createResultsOverviewSlide(XMLSlideShow ppt) {
+        logger.info("Starting to create Results Overview slide...");
+        XSLFSlide resultsSlide = initializeXSLFSlide(ppt);
+
+        createTextBox(resultsSlide, "Results Overview", 30.0, Color.BLACK, 0, true);
+        createTextBox(resultsSlide, "This section provides an overview of the performance metrics observed during the Couchbase load testing.", 18.0, Color.DARK_GRAY, 50, false);
+        createTextBox(resultsSlide, "Key Performance Metrics:", 20.0, Color.BLACK, 100, true);
+        createTextBox(resultsSlide, "• Average Latency of PUT Operations: Average latency measured in milliseconds.", 18.0, Color.DARK_GRAY, 130, false);
+        createTextBox(resultsSlide, "• Average Latency of GET Operations: Average latency measured in milliseconds.", 18.0, Color.DARK_GRAY, 170, false);
+        createTextBox(resultsSlide, "• Overall Average Response Time: Overall average response time measured in milliseconds.", 18.0, Color.DARK_GRAY, 210, false);
+        createTextBox(resultsSlide, "• Transactions Per Second (TPS): Total successful transactions processed per second.", 18.0, Color.DARK_GRAY, 250, false);
+        createTextBox(resultsSlide, "• Total Error Rate: Total error rate observed during the testing phase in percentage.", 18.0, Color.DARK_GRAY, 290, false);
+        createTextBox(resultsSlide, "• Maximum Latency of PUT Operations: Maximum latency recorded in milliseconds.", 18.0, Color.DARK_GRAY, 330, false);
+        createTextBox(resultsSlide, "• Maximum Latency of GET Operations: Maximum latency recorded in milliseconds.", 18.0, Color.DARK_GRAY, 370, false);
+        createTextBox(resultsSlide, "• Total Number of Successful Operations: Total successful operations executed.", 18.0, Color.DARK_GRAY, 410, false);
+        createTextBox(resultsSlide, "These metrics provide insights into Couchbase's performance under load and areas for potential optimization.", 18.0, Color.DARK_GRAY, 450, false);
+
+        logger.info("Results Overview slide creation complete.");
+    }
+
+    private void createThreadPoolResultsSlide(XMLSlideShow ppt) {
+        tableSlideGenerator.createThreadPoolResultsSlide(ppt);
+    }
+
+    private void createConnectionPoolResultsSlide(XMLSlideShow ppt) {
+        tableSlideGenerator.createConnectionPoolResultsSlide(ppt);
     }
 
     private void saveReport(XMLSlideShow ppt) {
