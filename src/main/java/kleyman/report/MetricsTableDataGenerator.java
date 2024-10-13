@@ -1,5 +1,6 @@
 package kleyman.report;
 
+import kleyman.loadtest.CouchbaseLoadTestScenarioProvider;
 import kleyman.metrics.CouchbaseMetrics;
 import kleyman.metrics.MetricManager;
 import org.slf4j.Logger;
@@ -25,6 +26,8 @@ public class MetricsTableDataGenerator {
     private static final int THREAD_POOL_END_INDEX = 12;
     private static final int CONNECTION_POOL_START_INDEX = 13;
     private static final int CONNECTION_POOL_END_INDEX = 15;
+    private static final int[] CONNECTION_POOL_SIZE = CouchbaseLoadTestScenarioProvider.CONNECTION_POOL_SIZE;
+    private int connectionsCounter = 0;
     private static final String[] HEADERS = {
             "Scenario ID",
             "Total Successful Operations",
@@ -32,9 +35,7 @@ public class MetricsTableDataGenerator {
             "Transactions Per Second (TPS)",
             "Average PUT Latency (ms)",
             "Average GET Latency (ms)",
-            "Overall Average Response Time (ms)",
-            "Max PUT Latency (ms)",
-            "Max GET Latency (ms)"
+            "Overall Average Response Time (ms)"
     };
 
     private final Map<String, CouchbaseMetrics> metricsMap;
@@ -44,14 +45,14 @@ public class MetricsTableDataGenerator {
     }
 
     public String[][] generateThreadPoolMetricsTableData() {
-        return generateMetricsTableDataForScenarioType(THREAD_POOL_START_INDEX, THREAD_POOL_END_INDEX);
+        return generateMetricsTableDataForScenarioType(THREAD_POOL_START_INDEX, THREAD_POOL_END_INDEX, null);
     }
 
     public String[][] generateConnectionPoolMetricsTableData() {
-        return generateMetricsTableDataForScenarioType(CONNECTION_POOL_START_INDEX, CONNECTION_POOL_END_INDEX);
+        return generateMetricsTableDataForScenarioType(CONNECTION_POOL_START_INDEX, CONNECTION_POOL_END_INDEX, CONNECTION_POOL_SIZE);
     }
 
-    private String[][] generateMetricsTableDataForScenarioType(int startIndex, int endIndex) {
+    private String[][] generateMetricsTableDataForScenarioType(int startIndex, int endIndex, int[] CONNECTION_POOL_SIZE) {
         logger.debug("Generating metrics table data for scenarios {} to {}", startIndex, endIndex);
         String[][] tableData = new String[endIndex - startIndex + 2][HEADERS.length];
         System.arraycopy(HEADERS, 0, tableData[0], 0, HEADERS.length);
@@ -61,15 +62,13 @@ public class MetricsTableDataGenerator {
             String scenarioId = "Scenario " + i;
             CouchbaseMetrics metrics = metricsMap.get(scenarioId);
             if (metrics != null) {
-                tableData[rowIndex][0] = scenarioId;
+                tableData[rowIndex][0] = creatScenarioId(scenarioId, metrics, CONNECTION_POOL_SIZE);
                 tableData[rowIndex][1] = String.valueOf(metrics.getTotalSuccessfulOperations());
                 tableData[rowIndex][2] = String.format("%.2f", metrics.getTotalErrorRate());
                 tableData[rowIndex][3] = String.format("%.2f", metrics.getTransactionsPerSecond());
                 tableData[rowIndex][4] = String.format("%.2f", metrics.getAveragePutLatency());
                 tableData[rowIndex][5] = String.format("%.2f", metrics.getAverageGetLatency());
                 tableData[rowIndex][6] = String.format("%.2f", metrics.getOverallAverageResponseTime());
-                tableData[rowIndex][7] = String.format("%.2f", metrics.getMaxPutLatency());
-                tableData[rowIndex][8] = String.format("%.2f", metrics.getMaxGetLatency());
                 rowIndex++;
             } else {
                 logger.warn("No metrics found for {}", scenarioId);
@@ -77,5 +76,31 @@ public class MetricsTableDataGenerator {
         }
         logger.debug("Metrics table data generation completed with {} rows.", rowIndex);
         return tableData;
+    }
+
+    private String creatScenarioId(String scenarioId, CouchbaseMetrics metrics, int[] connectionPoolSize) {
+
+        String scenarioIdRes = scenarioId;
+        if (connectionPoolSize == null) {
+            scenarioIdRes = scenarioIdRes + ": " + "threads=" + metrics.getThreadSize() + "," + getJsonSize(metrics)
+                    + "," + getKey(metrics);
+        } else {
+            scenarioIdRes = scenarioIdRes + ": " + "connections = " + CONNECTION_POOL_SIZE[connectionsCounter]
+                    + " threads =" + metrics.getThreadSize();
+            connectionsCounter++;
+        }
+        return scenarioIdRes;
+    }
+
+    private String getJsonSize(CouchbaseMetrics metrics) {
+        if (metrics.getJsonSize().contains("big")) {
+            return "25kb";
+        } else return "1kb";
+    }
+
+    private String getKey(CouchbaseMetrics metrics) {
+        if (metrics.isUniqueKeys()) {
+            return "unique keys";
+        } else return "shared key";
     }
 }

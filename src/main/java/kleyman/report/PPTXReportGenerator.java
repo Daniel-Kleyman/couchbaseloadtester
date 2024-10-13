@@ -1,7 +1,6 @@
 package kleyman.report;
 
 import kleyman.util.EnvironmentVariableUtils;
-import org.apache.poi.sl.usermodel.TableCell;
 import org.apache.poi.xslf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +46,8 @@ public class PPTXReportGenerator {
             createResultsOverviewSlide(ppt);
             createThreadPoolResultsSlide(ppt);
             createConnectionPoolResultsSlide(ppt);
+            createFindingsSuggestionsConclusionSlide(ppt);
+            createThankYouSlide(ppt);
             saveReport(ppt);
             logger.info("Report created successfully at {}", filePath);
         } catch (IOException e) {
@@ -128,9 +129,9 @@ public class PPTXReportGenerator {
         createTextBox(scenariosSlide, "1. Overview of Test Scenarios:", 20.0, Color.BLACK, 60, true); // Align with previous slide's section header size and anchor
         createTextBox(scenariosSlide, "• Purpose: To benchmark Couchbase's key-value functionality under various conditions.", 18.0, Color.DARK_GRAY, 90, false);
         // Create Scenario Types section with adjusted font and anchor
-        createTextBox(scenariosSlide, "2. Scenario Types:", 20.0, Color.BLACK, 135, true); // Adjusted to match section headers in other slides
-        createTextBox(scenariosSlide, "• Thread Pool Scenarios: Tests varying the number of threads used for load operations from 5 to 15, use 2 JSON files of different sizes (1 kb and 25 kb), write to unique or shared keys and use Couchbase default connection pool size.", 18.0, Color.DARK_GRAY, 165, false);
-        createTextBox(scenariosSlide, "• Connection Pool Scenarios: Tests evaluating performance with a fixed number of threads (10), use JSON files of same size (25 kb), unique keys, connection pool size vary from 5 to 15.", 18.0, Color.DARK_GRAY, 265, false);
+        createTextBox(scenariosSlide, "2. Scenario Types:", 20.0, Color.BLACK, 145, true); // Adjusted to match section headers in other slides
+        createTextBox(scenariosSlide, "• Thread Pool Scenarios: Tests varying the number of threads used for load operations from 5 to 15, use 2 JSON files of different sizes (1 kb and 25 kb), write to unique or shared keys and use Couchbase default connection pool size.", 18.0, Color.DARK_GRAY, 175, false);
+        createTextBox(scenariosSlide, "• Connection Pool Scenarios: Tests evaluating performance with a fixed number of threads (10), use JSON files of same size (25 kb), unique keys, connection pool size vary from 5 to 15.", 18.0, Color.DARK_GRAY, 275, false);
         logger.info("Test Scenarios slide creation complete.");
     }
 
@@ -171,10 +172,8 @@ public class PPTXReportGenerator {
         createTextBox(resultsSlide, "• Overall Average Response Time: Overall average response time measured in milliseconds.", 18.0, Color.DARK_GRAY, 210, false);
         createTextBox(resultsSlide, "• Transactions Per Second (TPS): Total successful transactions processed per second.", 18.0, Color.DARK_GRAY, 250, false);
         createTextBox(resultsSlide, "• Total Error Rate: Total error rate observed during the testing phase in percentage.", 18.0, Color.DARK_GRAY, 290, false);
-        createTextBox(resultsSlide, "• Maximum Latency of PUT Operations: Maximum latency recorded in milliseconds.", 18.0, Color.DARK_GRAY, 330, false);
-        createTextBox(resultsSlide, "• Maximum Latency of GET Operations: Maximum latency recorded in milliseconds.", 18.0, Color.DARK_GRAY, 370, false);
-        createTextBox(resultsSlide, "• Total Number of Successful Operations: Total successful operations executed.", 18.0, Color.DARK_GRAY, 410, false);
-        createTextBox(resultsSlide, "These metrics provide insights into Couchbase's performance under load and areas for potential optimization.", 18.0, Color.DARK_GRAY, 450, false);
+        createTextBox(resultsSlide, "• Total Number of Successful Operations: Total successful operations executed.", 18.0, Color.DARK_GRAY, 330, false);
+        createTextBox(resultsSlide, "These metrics provide insights into Couchbase's performance under load and areas for potential optimization.", 18.0, Color.DARK_GRAY, 370, false);
 
         logger.info("Results Overview slide creation complete.");
     }
@@ -185,6 +184,37 @@ public class PPTXReportGenerator {
 
     private void createConnectionPoolResultsSlide(XMLSlideShow ppt) {
         tableSlideGenerator.createConnectionPoolResultsSlide(ppt);
+    }
+
+    private void createFindingsSuggestionsConclusionSlide(XMLSlideShow ppt) {
+        logger.info("Creating Findings, Suggestions, and Conclusion slide...");
+        XSLFSlide findingsSlide = initializeXSLFSlide(ppt);
+
+        // Title
+        createTextBox(findingsSlide, "Findings, Suggestions, and Conclusion", 20.0, Color.BLACK, 0, true);
+
+        createTextBox(findingsSlide, "Findings:", 18.0, Color.BLACK, 30, true);
+        createTextBox(findingsSlide, "• Total Successful Operations: High counts in scenarios with more threads and smaller JSON sizes.", 13.0, Color.DARK_GRAY, 60, false);
+        createTextBox(findingsSlide, "• Transactions Per Second (TPS): The highest TPS was observed in scenarios with 15 threads and smaller payloads.", 13.0, Color.DARK_GRAY, 90, false);
+        createTextBox(findingsSlide, "• Shared vs. Unique Keys: Using shared keys resulted in better TPS in many scenarios, suggesting that caching mechanisms or key distribution may play a role in performance.", 13.0, Color.DARK_GRAY, 120, false);
+        createTextBox(findingsSlide, "• Performance Bottlenecks: A significant drop in TPS was noted at 15 threads with larger JSON sizes (25 KB), indicating a threshold where resource constraints begin to limit performance.", 13.0, Color.DARK_GRAY, 150, false);
+        createTextBox(findingsSlide, "• Diminishing Returns: A decline in TPS was evident when exceeding 5 threads, suggesting Couchbase may have optimal operating limits under the tested conditions.", 13.0, Color.DARK_GRAY, 195, false);
+        createTextBox(findingsSlide, "• Data size: Payload size greatly affects latency, with 25 KB causing significant increases in PUT and GET latencies compared to 1 KB, which had minimal impact.", 13.0, Color.DARK_GRAY, 225, false);
+        createTextBox(findingsSlide, "• Connection pool size: Predefined connection pool sizes showed minimal impact on database performance.", 13.0, Color.DARK_GRAY, 255, false);
+
+        createTextBox(findingsSlide, "Suggestions for Further Testing:", 18.0, Color.BLACK, 295, true);
+        createTextBox(findingsSlide, "• CPU Utilization, Memory Usage, Disk I/O Performance, Network Latency and Throughput, Couchbase Performance Metrics.", 13.0, Color.DARK_GRAY, 325, false);
+
+        createTextBox(findingsSlide, "Conclusion:", 18.0, Color.BLACK, 365, true);
+        createTextBox(findingsSlide, "Higher thread pool sizes generally increased the total successful operations, especially with smaller JSON payloads. However, beyond 5 threads, TPS began to decline, particularly for larger payloads, indicating diminishing returns due to resource contention. Therefore, optimal thread pool size is crucial to balance performance and latency, necessitating careful tuning based on workload characteristics.", 13.0, Color.DARK_GRAY, 395, false);
+        logger.info("Findings, Suggestions, and Conclusion slide creation complete.");
+    }
+
+    private void createThankYouSlide(XMLSlideShow ppt) {
+        logger.info("Creating Thank You slide...");
+        XSLFSlide findingsSlide = initializeXSLFSlide(ppt);
+        createTextBox(findingsSlide, "THANK YOU FOR YOUR ATTENTION!", 28.0, Color.BLACK, 200, true);
+        logger.info("Thank You slide creation complete.");
     }
 
     private void saveReport(XMLSlideShow ppt) {

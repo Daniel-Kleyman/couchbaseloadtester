@@ -28,10 +28,16 @@ public class CouchbaseMetrics {
     private final Counter getFailureCounter;
     private final Timer putTimer;
     private final Timer getTimer;
+    private final int threadSize;
+    private final String jsonSize;
+    private final boolean uniqueKeys;
 
-    public CouchbaseMetrics(MeterRegistry meterRegistry, String scenarioId) {
+    public CouchbaseMetrics(MeterRegistry meterRegistry, String scenarioId, int threadSize, String jsonSize, boolean uniqueKeys) {
         logger.info("Starting collection of metrics");
 
+        this.threadSize = threadSize;
+        this.jsonSize = jsonSize;
+        this.uniqueKeys = uniqueKeys;
         putSuccessCounter = Counter.builder("couchbase.put.success")
                 .description("Count of successful PUT operations")
                 .tag("scenario", scenarioId)
@@ -117,16 +123,6 @@ public class CouchbaseMetrics {
         double totalTransactions = totalSuccessfulTransactions + totalFailedTransactions;
 
         return totalTransactions == 0 ? 0 : (totalFailedTransactions / totalTransactions) * 100;
-    }
-
-    public double getMaxPutLatency() {
-        double currentMaxPutLatency = putTimer.max(TimeUnit.MILLISECONDS);
-        return currentMaxPutLatency == 0 ? 0 : Math.round(currentMaxPutLatency);
-    }
-
-    public double getMaxGetLatency() {
-        double currentMaxGetLatency = getTimer.max(TimeUnit.MILLISECONDS);
-        return currentMaxGetLatency == 0 ? 0 : Math.round(currentMaxGetLatency);
     }
 
     public double getTotalSuccessfulOperations() {

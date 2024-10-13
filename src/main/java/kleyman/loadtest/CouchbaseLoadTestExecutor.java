@@ -46,8 +46,8 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
         this.useUniqueKeys = useUniqueKeys;
         this.couchbaseService = couchbaseService;
         this.scenarioId = scenarioId;
-        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "500"));
-        this.couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getPrometheusRegistry(), scenarioId);
+        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "50"));
+        this.couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getPrometheusRegistry(), scenarioId, threadCount, jsonFilePath, useUniqueKeys);
     }
 
     /**
@@ -131,5 +131,4 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
             logger.error("Executor service interrupted during shutdown.", e);
         }
     }
-
 }

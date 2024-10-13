@@ -23,9 +23,9 @@ public class TableSlideGenerator {
     public void createThreadPoolResultsSlide(XMLSlideShow ppt) {
         logger.info("Creating Thread Pool Tests Results slide...");
         XSLFSlide threadPoolResultsSlide = PPTXReportGenerator.initializeXSLFSlide(ppt);
-        PPTXReportGenerator.createTextBox(threadPoolResultsSlide, "Thread Pool Tests Results", 30.0, Color.BLACK, 0, true);
+        PPTXReportGenerator.createTextBox(threadPoolResultsSlide, "Thread Pool Tests Results", 24.0, Color.BLACK, 0, true);
         String[][] threadPoolTableData = metricsTableGenerator.generateThreadPoolMetricsTableData();
-        addTableToSlide(threadPoolResultsSlide, threadPoolTableData);
+        addTableToSlide(threadPoolResultsSlide, threadPoolTableData, 60);
         logger.info("Thread Pool Tests Results slide creation complete.");
     }
 
@@ -34,19 +34,19 @@ public class TableSlideGenerator {
         XSLFSlide connectionPoolResultsSlide = PPTXReportGenerator.initializeXSLFSlide(ppt);
         PPTXReportGenerator.createTextBox(connectionPoolResultsSlide, "Connection Pool Tests Results", 30.0, Color.BLACK, 0, true);
         String[][] connectionPoolTableData = metricsTableGenerator.generateConnectionPoolMetricsTableData();
-        addTableToSlide(connectionPoolResultsSlide, connectionPoolTableData);
+        addTableToSlide(connectionPoolResultsSlide, connectionPoolTableData, 100);
         logger.info("Connection Pool Tests Results slide creation complete.");
     }
 
-    private void addTableToSlide(XSLFSlide slide, String[][] tableData) {
-        XSLFTable table = createTable(slide);
+    private void addTableToSlide(XSLFSlide slide, String[][] tableData, int y) {
+        XSLFTable table = createTable(slide, y);
         populateTableData(table, tableData);
         setColumnWidths(table, tableData[0].length);
     }
 
-    private XSLFTable createTable(XSLFSlide slide) {
+    private XSLFTable createTable(XSLFSlide slide, int y) {
         XSLFTable table = slide.createTable();
-        table.setAnchor(new Rectangle(50, 100, 400, 300)); // Set position and size of the table
+        table.setAnchor(new Rectangle(110, y, 400, 300));
         return table;
     }
 

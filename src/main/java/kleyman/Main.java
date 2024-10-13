@@ -8,8 +8,9 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Manages the lifecycle of metrics reporting using {@link MetricsSetup}
- * and runs the Couchbase tests using {@link CouchbaseTestRunner}.
+ * Manages the lifecycle of metrics reporting using the MetricsSetup class,
+ * runs the Couchbase tests using the CouchbaseTestRunner class,
+ * and generates a report in PowerPoint format.
  */
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -21,14 +22,13 @@ public class Main {
             logger.info("Metrics reporting started.");
             CouchbaseTestRunner testRunner = new CouchbaseTestRunner();
             testRunner.runTests();
+            PPTXReportGenerator report = new PPTXReportGenerator();
+            report.createReport();
         } catch (Exception e) {
             logger.error("Error during test execution: {}", e.getMessage(), e);
-       }
-        //finally {
-//            // MetricsSetup.stopMetricsServer();
-//            logger.info("Metrics reporting stopped.");
-//        }
-        PPTXReportGenerator report = new PPTXReportGenerator();
-        report.createReport();
+        } finally {
+            MetricsSetup.stopMetricsServer();
+            logger.info("Metrics reporting stopped.");
+        }
     }
 }

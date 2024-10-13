@@ -20,7 +20,7 @@ public class CouchbaseServiceTest {
     private static final String NON_EXISTENT_KEY = "nonExistentKey";
     private static final String CONNECTION_FAILED_MESSAGE = "Connection failed";
     private static final String UNEXPECTED_ERROR_MESSAGE = "Unexpected error";
-    private final CouchbaseMetrics couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getPrometheusRegistry(), " ");
+    private final CouchbaseMetrics couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getPrometheusRegistry(), " ", 1, " ", true);
     private CouchbaseConnectionManager connectionManager;
     private CouchbaseService couchbaseService;
     private JsonObject jsonData;

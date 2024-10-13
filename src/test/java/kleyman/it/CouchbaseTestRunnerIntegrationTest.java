@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CouchbaseTestRunnerIntegrationTest {
 
-    private final CouchbaseMetrics couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getPrometheusRegistry(), " ");
+    private final CouchbaseMetrics couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getPrometheusRegistry(), " ", 1, " ", true);
 
     @Test
     @DisplayName("Test runLoadTest scenario uploads and retrieves data")
