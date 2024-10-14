@@ -1,0 +1,1008 @@
+{
+  "company": {
+    "id": 12345,
+    "name": "Example Corporation",
+    "location": {
+      "address": "123 Example St",
+      "city": "Example City",
+      "state": "EX",
+      "zipcode": "12345",
+      "country": "Countryland"
+    },
+    "employees": [
+      {
+        "id": 1,
+        "name": "John Doe",
+        "age": 30,
+        "email": "john.doe@example.com",
+        "position": "Software Engineer",
+        "skills": ["Java", "Spring", "Couchbase", "Kubernetes"],
+        "projects": [
+          {
+            "projectId": 101,
+            "projectName": "Project Alpha",
+            "duration": "6 months",
+            "status": "completed"
+          },
+          {
+            "projectId": 102,
+            "projectName": "Project Beta",
+            "duration": "3 months",
+            "status": "ongoing"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "name": "Jane Smith",
+        "age": 28,
+        "email": "jane.smith@example.com",
+        "position": "Product Manager",
+        "skills": ["Agile", "Scrum", "Leadership"],
+        "projects": [
+          {
+            "projectId": 103,
+            "projectName": "Project Gamma",
+            "duration": "4 months",
+            "status": "completed"
+          },
+          {
+            "projectId": 104,
+            "projectName": "Project Delta",
+            "duration": "1 month",
+            "status": "ongoing"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "name": "Alice Johnson",
+        "age": 35,
+        "email": "alice.johnson@example.com",
+        "position": "UX Designer",
+        "skills": ["Figma", "User Research", "Prototyping"],
+        "projects": [
+          {
+            "projectId": 105,
+            "projectName": "Project Epsilon",
+            "duration": "2 months",
+            "status": "completed"
+          },
+          {
+            "projectId": 106,
+            "projectName": "Project Zeta",
+            "duration": "3 months",
+            "status": "ongoing"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "name": "David Brown",
+        "age": 40,
+        "email": "david.brown@example.com",
+        "position": "Data Scientist",
+        "skills": ["Python", "Machine Learning", "Statistics"],
+        "projects": [
+          {
+            "projectId": 107,
+            "projectName": "Project Eta",
+            "duration": "5 months",
+            "status": "completed"
+          },
+          {
+            "projectId": 108,
+            "projectName": "Project Theta",
+            "duration": "4 months",
+            "status": "ongoing"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "name": "Emily Davis",
+        "age": 32,
+        "email": "emily.davis@example.com",
+        "position": "Marketing Specialist",
+        "skills": ["SEO", "Content Marketing", "Social Media"],
+        "projects": [
+          {
+            "projectId": 109,
+            "projectName": "Project Iota",
+            "duration": "2 months",
+            "status": "completed"
+          },
+          {
+            "projectId": 110,
+            "projectName": "Project Kappa",
+            "duration": "6 months",
+            "status": "ongoing"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "name": "Michael Wilson",
+        "age": 45,
+        "email": "michael.wilson@example.com",
+        "position": "Network Administrator",
+        "skills": ["Networking", "Security", "Linux"],
+        "projects": [
+          {
+            "projectId": 111,
+            "projectName": "Project Lambda",
+            "duration": "3 months",
+            "status": "completed"
+          },
+          {
+            "projectId": 112,
+            "projectName": "Project Mu",
+            "duration": "1 month",
+            "status": "ongoing"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "name": "Jessica Taylor",
+        "age": 29,
+        "email": "jessica.taylor@example.com",
+        "position": "Business Analyst",
+        "skills": ["Business Analysis", "SQL", "Data Visualization"],
+        "projects": [
+          {
+            "projectId": 113,
+            "projectName": "Project Nu",
+            "duration": "4 months",
+            "status": "completed"
+          },
+          {
+            "projectId": 114,
+            "projectName": "Project Xi",
+            "duration": "2 months",
+            "status": "ongoing"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "name": "Robert Johnson",
+        "age": 38,
+        "email": "robert.johnson@example.com",
+        "position": "Systems Analyst",
+        "skills": ["System Analysis", "Integration", "Technical Support"],
+        "projects": [
+          {
+            "projectId": 115,
+            "projectName": "Project Omicron",
+            "duration": "6 months",
+            "status": "completed"
+          },
+          {
+            "projectId": 116,
+            "projectName": "Project Pi",
+            "duration": "3 months",
+            "status": "ongoing"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "name": "Sarah Lee",
+        "age": 27,
+        "email": "sarah.lee@example.com",
+        "position": "HR Manager",
+        "skills": ["Recruiting", "Employee Relations", "Compliance"],
+        "projects": [
+          {
+            "projectId": 117,
+            "projectName": "Project Rho",
+            "duration": "5 months",
+            "status": "completed"
+          },
+          {
+            "projectId": 118,
+            "projectName": "Project Sigma",
+            "duration": "2 months",
+            "status": "ongoing"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "name": "Daniel Martinez",
+        "age": 36,
+        "email": "daniel.martinez@example.com",
+        "position": "Sales Executive",
+        "skills": ["Sales", "Negotiation", "Customer Relationship"],
+        "projects": [
+          {
+            "projectId": 119,
+            "projectName": "Project Tau",
+            "duration": "3 months",
+            "status": "completed"
+          },
+          {
+            "projectId": 120,
+            "projectName": "Project Upsilon",
+            "duration": "4 months",
+            "status": "ongoing"
+          }
+        ]
+      }
+    ],
+    "departments": [
+      {
+        "departmentId": 1,
+        "departmentName": "Engineering",
+        "budget": 1000000,
+        "head": "John Doe",
+        "employees": 20
+      },
+      {
+        "departmentId": 2,
+        "departmentName": "Product Management",
+        "budget": 500000,
+        "head": "Jane Smith",
+        "employees": 10
+      },
+      {
+        "departmentId": 3,
+        "departmentName": "Design",
+        "budget": 300000,
+        "head": "Alice Johnson",
+        "employees": 8
+      },
+      {
+        "departmentId": 4,
+        "departmentName": "Data Science",
+        "budget": 800000,
+        "head": "David Brown",
+        "employees": 15
+      },
+      {
+        "departmentId": 5,
+        "departmentName": "Marketing",
+        "budget": 600000,
+        "head": "Emily Davis",
+        "employees": 12
+      },
+      {
+        "departmentId": 6,
+        "departmentName": "IT",
+        "budget": 900000,
+        "head": "Michael Wilson",
+        "employees": 10
+      },
+      {
+        "departmentId": 7,
+        "departmentName": "Business Analysis",
+        "budget": 500000,
+        "head": "Jessica Taylor",
+        "employees": 10
+      },
+      {
+        "departmentId": 8,
+        "departmentName": "Sales",
+        "budget": 700000,
+        "head": "Daniel Martinez",
+        "employees": 12
+      },
+      {
+        "departmentId": 9,
+        "departmentName": "HR",
+        "budget": 400000,
+        "head": "Sarah Lee",
+        "employees": 8
+      },
+      {
+        "departmentId": 10,
+        "departmentName": "Support",
+        "budget": 300000,
+        "head": "Robert Johnson",
+        "employees": 7
+      }
+    ]
+  },
+  "sales": {
+    "year": 2023,
+    "quarterly": {
+      "Q1": {
+        "revenue": 250000,
+        "expenses": 150000,
+        "profit": 100000
+      },
+      "Q2": {
+        "revenue": 300000,
+        "expenses": 180000,
+        "profit": 120000
+      },
+      "Q3": {
+        "revenue": 350000,
+        "expenses": 200000,
+        "profit": 150000
+      },
+      "Q4": {
+        "revenue": 400000,
+        "expenses": 220000,
+        "profit": 180000
+      }
+    }
+  },
+  "clients": [
+    {
+      "clientId": 1,
+      "clientName": "Client A",
+      "contact": {
+        "name": "Alice Cooper",
+        "email": "alice.cooper@clienta.com",
+        "phone": "123-456-7890"
+      },
+      "projects": [
+        {
+          "projectId": 201,
+          "projectName": "Project 1A",
+          "duration": "6 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 202,
+          "projectName": "Project 1B",
+          "duration": "3 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "clientId": 2,
+      "clientName": "Client B",
+      "contact": {
+        "name": "Bob Marley",
+        "email": "bob.marley@clientb.com",
+        "phone": "234-567-8901"
+      },
+      "projects": [
+        {
+          "projectId": 203,
+          "projectName": "Project 2A",
+          "duration": "5 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 204,
+          "projectName": "Project 2B",
+          "duration": "4 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "clientId": 3,
+      "clientName": "Client C",
+      "contact": {
+        "name": "Charlie Brown",
+        "email": "charlie.brown@clientc.com",
+        "phone": "345-678-9012"
+      },
+      "projects": [
+        {
+          "projectId": 205,
+          "projectName": "Project 3A",
+          "duration": "7 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 206,
+          "projectName": "Project 3B",
+          "duration": "3 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "clientId": 4,
+      "clientName": "Client D",
+      "contact": {
+        "name": "David Beckham",
+        "email": "david.beckham@clientd.com",
+        "phone": "456-789-0123"
+      },
+      "projects": [
+        {
+          "projectId": 207,
+          "projectName": "Project 4A",
+          "duration": "4 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 208,
+          "projectName": "Project 4B",
+          "duration": "2 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "clientId": 5,
+      "clientName": "Client E",
+      "contact": {
+        "name": "Emily Blunt",
+        "email": "emily.blunt@cliente.com",
+        "phone": "567-890-1234"
+      },
+      "projects": [
+        {
+          "projectId": 209,
+          "projectName": "Project 5A",
+          "duration": "8 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 210,
+          "projectName": "Project 5B",
+          "duration": "5 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "clientId": 6,
+      "clientName": "Client F",
+      "contact": {
+        "name": "Frank Ocean",
+        "email": "frank.ocean@clientf.com",
+        "phone": "678-901-2345"
+      },
+      "projects": [
+        {
+          "projectId": 211,
+          "projectName": "Project 6A",
+          "duration": "3 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 212,
+          "projectName": "Project 6B",
+          "duration": "1 month",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "clientId": 7,
+      "clientName": "Client G",
+      "contact": {
+        "name": "George Clooney",
+        "email": "george.clooney@clientg.com",
+        "phone": "789-012-3456"
+      },
+      "projects": [
+        {
+          "projectId": 213,
+          "projectName": "Project 7A",
+          "duration": "4 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 214,
+          "projectName": "Project 7B",
+          "duration": "2 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "clientId": 8,
+      "clientName": "Client H",
+      "contact": {
+        "name": "Hannah Montana",
+        "email": "hannah.montana@clienth.com",
+        "phone": "890-123-4567"
+      },
+      "projects": [
+        {
+          "projectId": 215,
+          "projectName": "Project 8A",
+          "duration": "9 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 216,
+          "projectName": "Project 8B",
+          "duration": "6 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "clientId": 9,
+      "clientName": "Client I",
+      "contact": {
+        "name": "Iggy Azalea",
+        "email": "iggy.azalea@clienti.com",
+        "phone": "901-234-5678"
+      },
+      "projects": [
+        {
+          "projectId": 217,
+          "projectName": "Project 9A",
+          "duration": "2 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 218,
+          "projectName": "Project 9B",
+          "duration": "5 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "clientId": 10,
+      "clientName": "Client J",
+      "contact": {
+        "name": "James Bond",
+        "email": "james.bond@clientj.com",
+        "phone": "012-345-6789"
+      },
+      "projects": [
+        {
+          "projectId": 219,
+          "projectName": "Project 10A",
+          "duration": "3 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 220,
+          "projectName": "Project 10B",
+          "duration": "4 months",
+          "status": "ongoing"
+        }
+      ]
+    }
+  ],
+  "partners": [
+    {
+      "partnerId": 1,
+      "partnerName": "Partner A",
+      "contact": {
+        "name": "Alice Wonderland",
+        "email": "alice.wonderland@partnera.com",
+        "phone": "123-456-7890"
+      },
+      "projects": [
+        {
+          "projectId": 301,
+          "projectName": "Project PA1",
+          "duration": "4 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 302,
+          "projectName": "Project PA2",
+          "duration": "3 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "partnerId": 2,
+      "partnerName": "Partner B",
+      "contact": {
+        "name": "Bob Builder",
+        "email": "bob.builder@partnerb.com",
+        "phone": "234-567-8901"
+      },
+      "projects": [
+        {
+          "projectId": 303,
+          "projectName": "Project PB1",
+          "duration": "5 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 304,
+          "projectName": "Project PB2",
+          "duration": "2 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "partnerId": 3,
+      "partnerName": "Partner C",
+      "contact": {
+        "name": "Charlie Chaplin",
+        "email": "charlie.chaplin@partnerc.com",
+        "phone": "345-678-9012"
+      },
+      "projects": [
+        {
+          "projectId": 305,
+          "projectName": "Project PC1",
+          "duration": "7 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 306,
+          "projectName": "Project PC2",
+          "duration": "6 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "partnerId": 4,
+      "partnerName": "Partner D",
+      "contact": {
+        "name": "David Copperfield",
+        "email": "david.copperfield@partnerd.com",
+        "phone": "456-789-0123"
+      },
+      "projects": [
+        {
+          "projectId": 307,
+          "projectName": "Project PD1",
+          "duration": "3 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 308,
+          "projectName": "Project PD2",
+          "duration": "5 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "partnerId": 5,
+      "partnerName": "Partner E",
+      "contact": {
+        "name": "Eve Online",
+        "email": "eve.online@partnere.com",
+        "phone": "567-890-1234"
+      },
+      "projects": [
+        {
+          "projectId": 309,
+          "projectName": "Project PE1",
+          "duration": "4 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 310,
+          "projectName": "Project PE2",
+          "duration": "1 month",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "partnerId": 6,
+      "partnerName": "Partner F",
+      "contact": {
+        "name": "Frank Sinatra",
+        "email": "frank.sinatra@partnerf.com",
+        "phone": "678-901-2345"
+      },
+      "projects": [
+        {
+          "projectId": 311,
+          "projectName": "Project PF1",
+          "duration": "2 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 312,
+          "projectName": "Project PF2",
+          "duration": "6 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "partnerId": 7,
+      "partnerName": "Partner G",
+      "contact": {
+        "name": "George Orwell",
+        "email": "george.orwell@partnerg.com",
+        "phone": "789-012-3456"
+      },
+      "projects": [
+        {
+          "projectId": 313,
+          "projectName": "Project PG1",
+          "duration": "8 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 314,
+          "projectName": "Project PG2",
+          "duration": "3 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "partnerId": 8,
+      "partnerName": "Partner H",
+      "contact": {
+        "name": "Hannah Arendt",
+        "email": "hannah.arendt@partnerh.com",
+        "phone": "890-123-4567"
+      },
+      "projects": [
+        {
+          "projectId": 315,
+          "projectName": "Project PH1",
+          "duration": "4 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 316,
+          "projectName": "Project PH2",
+          "duration": "7 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "partnerId": 9,
+      "partnerName": "Partner I",
+      "contact": {
+        "name": "Igor Stravinsky",
+        "email": "igor.stravinsky@partneri.com",
+        "phone": "901-234-5678"
+      },
+      "projects": [
+        {
+          "projectId": 317,
+          "projectName": "Project PI1",
+          "duration": "5 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 318,
+          "projectName": "Project PI2",
+          "duration": "4 months",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "partnerId": 10,
+      "partnerName": "Partner J",
+      "contact": {
+        "name": "Jack Daniels",
+        "email": "jack.daniels@partnerj.com",
+        "phone": "012-345-6789"
+      },
+      "projects": [
+        {
+          "projectId": 319,
+          "projectName": "Project PJ1",
+          "duration": "6 months",
+          "status": "completed"
+        },
+        {
+          "projectId": 320,
+          "projectName": "Project PJ2",
+          "duration": "2 months",
+          "status": "ongoing"
+        }
+      ]
+    }
+  ],
+  "employees": [
+    {
+      "employeeId": 1,
+      "employeeName": "Employee A",
+      "position": "Software Developer",
+      "contact": {
+        "email": "employee.a@company.com",
+        "phone": "111-222-3333"
+      },
+      "projects": [
+        {
+          "projectId": 401,
+          "projectName": "Project 1A",
+          "status": "completed"
+        },
+        {
+          "projectId": 402,
+          "projectName": "Project 1B",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "employeeId": 2,
+      "employeeName": "Employee B",
+      "position": "Project Manager",
+      "contact": {
+        "email": "employee.b@company.com",
+        "phone": "222-333-4444"
+      },
+      "projects": [
+        {
+          "projectId": 403,
+          "projectName": "Project 2A",
+          "status": "completed"
+        },
+        {
+          "projectId": 404,
+          "projectName": "Project 2B",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "employeeId": 3,
+      "employeeName": "Employee C",
+      "position": "UI/UX Designer",
+      "contact": {
+        "email": "employee.c@company.com",
+        "phone": "333-444-5555"
+      },
+      "projects": [
+        {
+          "projectId": 405,
+          "projectName": "Project 3A",
+          "status": "completed"
+        },
+        {
+          "projectId": 406,
+          "projectName": "Project 3B",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "employeeId": 4,
+      "employeeName": "Employee D",
+      "position": "DevOps Engineer",
+      "contact": {
+        "email": "employee.d@company.com",
+        "phone": "444-555-6666"
+      },
+      "projects": [
+        {
+          "projectId": 407,
+          "projectName": "Project 4A",
+          "status": "completed"
+        },
+        {
+          "projectId": 408,
+          "projectName": "Project 4B",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "employeeId": 5,
+      "employeeName": "Employee E",
+      "position": "Data Analyst",
+      "contact": {
+        "email": "employee.e@company.com",
+        "phone": "555-666-7777"
+      },
+      "projects": [
+        {
+          "projectId": 409,
+          "projectName": "Project 5A",
+          "status": "completed"
+        },
+        {
+          "projectId": 410,
+          "projectName": "Project 5B",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "employeeId": 6,
+      "employeeName": "Employee F",
+      "position": "Quality Assurance",
+      "contact": {
+        "email": "employee.f@company.com",
+        "phone": "666-777-8888"
+      },
+      "projects": [
+        {
+          "projectId": 411,
+          "projectName": "Project 6A",
+          "status": "completed"
+        },
+        {
+          "projectId": 412,
+          "projectName": "Project 6B",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "employeeId": 7,
+      "employeeName": "Employee G",
+      "position": "Business Analyst",
+      "contact": {
+        "email": "employee.g@company.com",
+        "phone": "777-888-9999"
+      },
+      "projects": [
+        {
+          "projectId": 413,
+          "projectName": "Project 7A",
+          "status": "completed"
+        },
+        {
+          "projectId": 414,
+          "projectName": "Project 7B",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "employeeId": 8,
+      "employeeName": "Employee H",
+      "position": "System Administrator",
+      "contact": {
+        "email": "employee.h@company.com",
+        "phone": "888-999-0000"
+      },
+      "projects": [
+        {
+          "projectId": 415,
+          "projectName": "Project 8A",
+          "status": "completed"
+        },
+        {
+          "projectId": 416,
+          "projectName": "Project 8B",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "employeeId": 9,
+      "employeeName": "Employee I",
+      "position": "Network Engineer",
+      "contact": {
+        "email": "employee.i@company.com",
+        "phone": "999-000-1111"
+      },
+      "projects": [
+        {
+          "projectId": 417,
+          "projectName": "Project 9A",
+          "status": "completed"
+        },
+        {
+          "projectId": 418,
+          "projectName": "Project 9B",
+          "status": "ongoing"
+        }
+      ]
+    },
+    {
+      "employeeId": 10,
+      "employeeName": "Employee J",
+      "position": "Technical Support",
+      "contact": {
+        "email": "employee.j@company.com",
+        "phone": "000-111-2222"
+      },
+      "projects": [
+        {
+          "projectId": 419,
+          "projectName": "Project 10A",
+          "status": "completed"
+        },
+        {
+          "projectId": 420,
+          "projectName": "Project 10B",
+          "status": "ongoing"
+        }
+      ]
+    }
+  ]
+}
