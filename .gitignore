@@ -1,6 +1,12 @@
 # Compiled class file
 *.class
 
+### IntelliJ IDEA ###
+.idea/
+
+# Target directory for compiled classes and packages
+target/
+
 # Log file
 *.log
 
