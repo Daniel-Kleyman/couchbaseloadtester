@@ -10,7 +10,7 @@ Couchbase Load Tester is a performance testing tool designed to evaluate the sca
 To install Couchbase Load Tester, follow these steps:
 1.	**Clone the repository:** 
 ```bash 
-git clone https:// https://github.com/Daniel-Kleyman/couchbaseloadtester
+git clone https://github.com/Daniel-Kleyman/couchbaseloadtester
 cd couchbaseloadtester
 ```
 2.	**Install dependencies:**
