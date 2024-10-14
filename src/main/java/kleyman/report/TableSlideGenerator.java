@@ -123,7 +123,7 @@ public class TableSlideGenerator {
      */
     private void setColumnWidths(XSLFTable table, int numCols) {
         for (int col = 0; col < numCols; col++) {
-            table.setColumnWidth(col, 70); // Set column width
+            table.setColumnWidth(col, 70);
         }
     }
 }

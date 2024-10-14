@@ -17,10 +17,15 @@ import java.io.IOException;
  *
  * <p>The report includes:
  * <ul>
- *     <li>Title slide</li>
+ *    <li>Title slide</li>
  *     <li>Introduction slide</li>
  *     <li>Couchbase setup and load testing methodology</li>
  *     <li>Test scenarios and specific scenarios</li>
+ *     <li>Results overview</li>
+ *     <li>Thread pool results</li>
+ *     <li>Connection pool results</li>
+ *     <li>Findings, suggestions and conclusion</li>
+ *     <li>Thank you slide</li>
  * </ul>
  */
 public class PPTXReportGenerator {
@@ -104,18 +109,18 @@ public class PPTXReportGenerator {
         // Create title
         createTextBox(combinedSlide, "Couchbase Setup and Load Testing Methodology", 23.0, Color.BLACK, 10, true);
         // Create Couchbase Setup section
-        createTextBox(combinedSlide, "1. Couchbase Setup:", 20.0, Color.BLACK, 60, true); // 100 -> 60
-        createTextBox(combinedSlide, "• Installation: The Couchbase instance was set up using Docker with default settings.", 18.0, Color.DARK_GRAY, 90, false); // 130 -> 90
-        createTextBox(combinedSlide, "• Bucket Configuration: A bucket named 'loadtest' was created for testing.", 18.0, Color.DARK_GRAY, 135, false); // 175 -> 135
+        createTextBox(combinedSlide, "1. Couchbase Setup:", 20.0, Color.BLACK, 60, true);
+        createTextBox(combinedSlide, "• Installation: The Couchbase instance was set up using Docker with default settings.", 18.0, Color.DARK_GRAY, 90, false);
+        createTextBox(combinedSlide, "• Bucket Configuration: A bucket named 'loadtest' was created for testing.", 18.0, Color.DARK_GRAY, 135, false);
         // Create Load Testing Methodology section
-        createTextBox(combinedSlide, "2. Load Testing Methodology:", 20.0, Color.BLACK, 190, true); // 230 -> 190
-        createTextBox(combinedSlide, "• Multi-threaded Java Application: Each thread uploads a JSON file and retrieves it.", 18.0, Color.DARK_GRAY, 220, false); // 260 -> 220
-        createTextBox(combinedSlide, "• Test Duration: The load tests were executed for 3 minutes.", 18.0, Color.DARK_GRAY, 265, false); // 305 -> 265
-        createTextBox(combinedSlide, "• Operations Performed: Each thread performed one upload followed by three retrieve operations of the uploaded file by key.", 18.0, Color.DARK_GRAY, 290, false); // 330 -> 290
+        createTextBox(combinedSlide, "2. Load Testing Methodology:", 20.0, Color.BLACK, 190, true);
+        createTextBox(combinedSlide, "• Multi-threaded Java Application: Each thread uploads a JSON file and retrieves it.", 18.0, Color.DARK_GRAY, 220, false);
+        createTextBox(combinedSlide, "• Test Duration: The load tests were executed for 3 minutes.", 18.0, Color.DARK_GRAY, 265, false);
+        createTextBox(combinedSlide, "• Operations Performed: Each thread performed one upload followed by three retrieve operations of the uploaded file by key.", 18.0, Color.DARK_GRAY, 290, false);
         // Add monitoring details
-        createTextBox(combinedSlide, "3. Monitoring:", 20.0, Color.BLACK, 345, true); // 385 -> 345
-        createTextBox(combinedSlide, "• Metrics Collection: Micrometer was used to collect application performance metrics.", 18.0, Color.DARK_GRAY, 370, false); // 410 -> 370
-        createTextBox(combinedSlide, "• Metrics Storage: Prometheus was utilized for storing the collected metrics.", 18.0, Color.DARK_GRAY, 420, false); // 435 -> 395
+        createTextBox(combinedSlide, "3. Monitoring:", 20.0, Color.BLACK, 345, true);
+        createTextBox(combinedSlide, "• Metrics Collection: Micrometer was used to collect application performance metrics.", 18.0, Color.DARK_GRAY, 370, false);
+        createTextBox(combinedSlide, "• Metrics Storage: Prometheus was utilized for storing the collected metrics.", 18.0, Color.DARK_GRAY, 420, false);
         createTextBox(combinedSlide, "Report generated using Apache POI.", 18.0, Color.DARK_GRAY, 470, false);
         logger.info("Couchbase Setup And Load Testing slide creation complete.");
     }
@@ -123,13 +128,13 @@ public class PPTXReportGenerator {
     private void createTestScenariosSlide(XMLSlideShow ppt) {
         logger.info("Creating Test Scenarios slide...");
         XSLFSlide scenariosSlide = initializeXSLFSlide(ppt);
-        // Create title with adjusted font and anchor
+        // Create title
         createTextBox(scenariosSlide, "Test Scenarios for Couchbase Load Testing", 23.0, Color.BLACK, 10, true);
-        // Create Overview section with adjusted font and anchor
-        createTextBox(scenariosSlide, "1. Overview of Test Scenarios:", 20.0, Color.BLACK, 60, true); // Align with previous slide's section header size and anchor
+        // Create Overview section
+        createTextBox(scenariosSlide, "1. Overview of Test Scenarios:", 20.0, Color.BLACK, 60, true);
         createTextBox(scenariosSlide, "• Purpose: To benchmark Couchbase's key-value functionality under various conditions.", 18.0, Color.DARK_GRAY, 90, false);
-        // Create Scenario Types section with adjusted font and anchor
-        createTextBox(scenariosSlide, "2. Scenario Types:", 20.0, Color.BLACK, 145, true); // Adjusted to match section headers in other slides
+        // Create Scenario Types section
+        createTextBox(scenariosSlide, "2. Scenario Types:", 20.0, Color.BLACK, 145, true);
         createTextBox(scenariosSlide, "• Thread Pool Scenarios: Tests varying the number of threads used for load operations from 5 to 15, use 2 JSON files of different sizes (1 kb and 25 kb), write to unique or shared keys and use Couchbase default connection pool size.", 18.0, Color.DARK_GRAY, 175, false);
         createTextBox(scenariosSlide, "• Connection Pool Scenarios: Tests evaluating performance with a fixed number of threads (10), use JSON files of same size (25 kb), unique keys, connection pool size vary from 5 to 15.", 18.0, Color.DARK_GRAY, 275, false);
         logger.info("Test Scenarios slide creation complete.");
@@ -140,7 +145,7 @@ public class PPTXReportGenerator {
         // Create a new slide for specific scenarios
         XSLFSlide scenariosSlide = initializeXSLFSlide(ppt);
         // Create title for the scenarios
-        createTextBox(scenariosSlide, "Specific Scenarios", 28.0, Color.BLACK, 0, true); // Title size 28
+        createTextBox(scenariosSlide, "Specific Scenarios", 28.0, Color.BLACK, 0, true);
         // Add each scenario with adjusted anchors
         createTextBox(scenariosSlide, "  Scenario 1: 5 threads, 25 kb JSON, unique keys.", 14.0, Color.DARK_GRAY, 60, false);
         createTextBox(scenariosSlide, "  Scenario 2: 5 threads, 25 kb JSON, shared key.", 14.0, Color.DARK_GRAY, 90, false);
@@ -191,11 +196,11 @@ public class PPTXReportGenerator {
         XSLFSlide findingsSlide = initializeXSLFSlide(ppt);
 
         // Title
-        createTextBox(findingsSlide, "Findings, Suggestions, and Conclusion", 20.0, Color.BLACK, 0, true);
+        createTextBox(findingsSlide, "Findings, Suggestions and Conclusion", 20.0, Color.BLACK, 0, true);
 
         createTextBox(findingsSlide, "Findings:", 18.0, Color.BLACK, 30, true);
         createTextBox(findingsSlide, "• Total Successful Operations: High counts in scenarios with more threads and smaller JSON sizes.", 13.0, Color.DARK_GRAY, 60, false);
-        createTextBox(findingsSlide, "• Transactions Per Second (TPS): The highest TPS was observed in scenarios with 15 threads and smaller payloads.", 13.0, Color.DARK_GRAY, 90, false);
+        createTextBox(findingsSlide, "• Transactions Per Second (TPS): The highest TPS was observed in scenarios with 5 threads and smaller payloads.", 13.0, Color.DARK_GRAY, 90, false);
         createTextBox(findingsSlide, "• Shared vs. Unique Keys: Using shared keys resulted in better TPS in many scenarios, suggesting that caching mechanisms or key distribution may play a role in performance.", 13.0, Color.DARK_GRAY, 120, false);
         createTextBox(findingsSlide, "• Performance Bottlenecks: A significant drop in TPS was noted at 15 threads with larger JSON sizes (25 KB), indicating a threshold where resource constraints begin to limit performance.", 13.0, Color.DARK_GRAY, 150, false);
         createTextBox(findingsSlide, "• Diminishing Returns: A decline in TPS was evident when exceeding 5 threads, suggesting Couchbase may have optimal operating limits under the tested conditions.", 13.0, Color.DARK_GRAY, 195, false);

@@ -46,7 +46,7 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
         this.useUniqueKeys = useUniqueKeys;
         this.couchbaseService = couchbaseService;
         this.scenarioId = scenarioId;
-        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "50"));
+        this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "180000"));
         this.couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getPrometheusRegistry(), scenarioId, threadCount, jsonFilePath, useUniqueKeys);
     }
 

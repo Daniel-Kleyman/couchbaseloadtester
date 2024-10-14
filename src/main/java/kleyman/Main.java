@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Manages the lifecycle of metrics reporting using the MetricsSetup class,
+ * Main class that manages the lifecycle of metrics reporting using the MetricsSetup class,
  * runs the Couchbase tests using the CouchbaseTestRunner class,
  * and generates a report in PowerPoint format.
  */

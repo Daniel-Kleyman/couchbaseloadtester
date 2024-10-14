@@ -15,7 +15,7 @@ public class EnvironmentVariableUtils {
             logger.error("Environment variable {} not set or empty", variable);
             throw new IllegalArgumentException("Environment variable " + variable + " not set or empty");
         }
-        logger.info("Retrieved environment variable: {}" , variable);
+        logger.info("Retrieved environment variable: {}", variable);
         return value;
     }
 }

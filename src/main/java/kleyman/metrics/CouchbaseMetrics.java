@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit;
  * This class manages metrics for PUT and GET operations using Micrometer,
  * including counters for success and failure rates, and timers for operation latencies.
  *
- * <p>It provides methods to increment counters, record latencies, and calculate metrics
+ * It provides methods to increment counters, record latencies, and calculate metrics
  * such as average latency, transactions per second, error rates, and maximum latencies
- * for performance monitoring and analysis.</p>
+ * for performance monitoring and analysis.
  */
 @Getter
 public class CouchbaseMetrics {

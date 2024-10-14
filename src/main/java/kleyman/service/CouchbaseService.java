@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Service class for interacting with Couchbase database.
  */
-public class CouchbaseService implements DataBaseService<JsonObject> {
+public class CouchbaseService implements DataBaseService<JsonObject, CouchbaseMetrics> {
     private final CouchbaseConnectionManager connectionManager;
     private static final Logger logger = LoggerFactory.getLogger(CouchbaseService.class);
 
