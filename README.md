@@ -6,7 +6,7 @@ Couchbase Load Tester is a performance testing tool designed to evaluate the sca
 **Versions:**  
 There are two versions of the program:
 - **Synchronous**: This version operates in a traditional, blocking manner where requests are handled one at a time. It’s suitable for scenarios where simplicity and ease of debugging are prioritized.
-- **Asynchronous**: This version leverages non-blocking operations, allowing for concurrent processing of requests. It significantly improves throughput and is ideal for simulating high-load scenarios where multiple users interact with the database simultaneously. You can find this version in the [async-couchbase-test branch](https://github.com/Daniel-Kleyman/couchbaseloadtester/async-couchbase-test).
+- **Asynchronous**: This version leverages non-blocking operations, allowing for concurrent processing of requests. It significantly improves throughput and is ideal for simulating high-load scenarios where multiple users interact with the database simultaneously. You can find this version in the [async-couchbase-test branch](https://github.com/Daniel-Kleyman/couchbaseloadtester/tree/async-couchbase-test).
 
 
 ## Key Features
