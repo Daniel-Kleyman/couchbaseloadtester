@@ -12,9 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Couchbase implementation of the LoadTestExecutor interface for conducting load tests.
@@ -30,6 +34,9 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
     private final CouchbaseService couchbaseService;
     private final CouchbaseMetrics couchbaseMetrics;
     private final String scenarioId;
+    private final AtomicInteger[] operationCounters;
+    @Getter
+    private final List<CompletableFuture<Void>> futureList;
 
     /**
      * Constructs a CouchbaseTestScenario for running load tests.
@@ -48,6 +55,11 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
         this.scenarioId = scenarioId;
         this.testDurationMillis = Long.parseLong(System.getProperty("load.test.duration.millis", "180000"));
         this.couchbaseMetrics = new CouchbaseMetrics(MetricsSetup.getPrometheusRegistry(), scenarioId, threadCount, jsonFilePath, useUniqueKeys);
+        this.operationCounters = new AtomicInteger[threadCount];
+        this.futureList = new ArrayList<>();
+        for (int i = 0; i < threadCount; i++) {
+            this.operationCounters[i] = new AtomicInteger(0);
+        }
     }
 
     /**
@@ -60,8 +72,9 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
     public void executeLoadTest() {
         logger.info("Starting load test with {} threads using unique keys: {} by {}", threadCount, useUniqueKeys, scenarioId);
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+
         for (int i = 1; i <= threadCount; i++) {
-            JsonObject jsonData = loadJsonDataFromFile(jsonFilePath + i + ".json");
+            JsonObject jsonData = loadJsonDataFromFile(jsonFilePath + 1 + ".json");
             if (jsonData == null) return;
             final int threadId = i;
             executor.submit(() -> performThreadOperations(threadId, jsonData));
@@ -92,24 +105,42 @@ public class CouchbaseLoadTestExecutor implements LoadTestExecutor {
     private void performThreadOperations(int threadId, JsonObject jsonData) {
         logger.info("Thread {} starting operations.", threadId);
         long startTime = System.currentTimeMillis();
+
+        // Keep looping for the duration of the test without waiting for previous operations to complete
         while (System.currentTimeMillis() - startTime <= testDurationMillis) {
-            String key = createKeyKey(threadId);
-            try {
-                couchbaseService.upload(key, jsonData, couchbaseMetrics);
-                logger.debug("Thread {}: Uploaded data for key: {}", threadId, key);
-                couchbaseService.retrieveJsonThreeTimes(key, couchbaseMetrics);
-                logger.debug("Thread {}: Uploaded and retrieved data for key: {}", threadId, key);
-            } catch (CouchbaseException e) {
-                logger.error("Thread {}: Couchbase error during operations for key: {}", threadId, key, e);
-            } catch (Exception e) {
-                logger.error("Thread {}: Unexpected error during operations for key: {}", threadId, key, e);
-            }
+            String key = createUniqueKey(threadId);
+            // Perform the load operation asynchronously
+            CompletableFuture<Void> loadFuture = CompletableFuture.runAsync(() -> {
+                try {
+                    couchbaseService.upload(key, jsonData, couchbaseMetrics);
+                    logger.debug("Thread {}: Uploaded data for key: {}", threadId, key);
+                } catch (CouchbaseException e) {
+                    logger.error("Thread {}: Couchbase error during upload for key: {}", threadId, key, e);
+                } catch (Exception e) {
+                    logger.error("Thread {}: Unexpected error during upload for key: {}", threadId, key, e);
+                }
+            });
+
+            // After the load is complete, asynchronously trigger the retrieve operation
+            CompletableFuture<Void> retrieveFuture = loadFuture.thenRunAsync(() -> {
+                try {
+                    couchbaseService.retrieveJsonThreeTimes(key, couchbaseMetrics);
+                    logger.debug("Thread {}: Retrieved data for key: {}", threadId, key);
+                } catch (CouchbaseException e) {
+                    logger.error("Thread {}: Couchbase error during retrieval for key: {}", threadId, key, e);
+                } catch (Exception e) {
+                    logger.error("Thread {}: Unexpected error during retrieval for key: {}", threadId, key, e);
+                }
+            });
+            futureList.add(retrieveFuture);
         }
         logger.info("Thread {} completed operations.", threadId);
     }
 
-    String createKeyKey(int threadId) {
-        return useUniqueKeys ? "user::" + threadId + "::" + System.nanoTime() : "user::shared";
+    String createUniqueKey(int threadId) {
+        long timestamp = System.currentTimeMillis();
+        int operationNumber = operationCounters[threadId - 1].incrementAndGet();
+        return useUniqueKeys ? "user::" + threadId + "::" + operationNumber + "::" + timestamp : "user::shared";
     }
 
     /**

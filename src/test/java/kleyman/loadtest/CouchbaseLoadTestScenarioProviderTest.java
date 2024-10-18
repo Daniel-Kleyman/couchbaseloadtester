@@ -33,19 +33,4 @@ class CouchbaseLoadTestScenarioProviderTest {
         assertNotNull(scenarios, "Scenarios should not be null");
         assertEquals(12, scenarios.size(), "Expected 12 scenarios to be created");
     }
-
-    @Test
-    @DisplayName("Test executor for connection pool test")
-    void givenCouchbaseLoadTestScenarioProvider_whenExecutorForConnectionPoolTestAccessed_thenReturnsCouchbaseLoadTestExecutorInstance() {
-        // Given
-        // A CouchbaseLoadTestScenarioProvider with a mocked CouchbaseService
-
-        // When
-        List<CouchbaseLoadTestExecutor> scenarios = scenarioProvider.createConnectionPoolScenarios();
-
-        // Then
-        assertNotNull(scenarios, "Scenarios should not be null");
-        assertEquals(3, scenarios.size(), "Expected 3 scenarios to be created");
-    }
-
 }

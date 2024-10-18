@@ -25,17 +25,8 @@ public class TableSlideGenerator {
         XSLFSlide threadPoolResultsSlide = PPTXReportGenerator.initializeXSLFSlide(ppt);
         PPTXReportGenerator.createTextBox(threadPoolResultsSlide, "Thread Pool Tests Results", 24.0, Color.BLACK, 0, true);
         String[][] threadPoolTableData = metricsTableGenerator.generateThreadPoolMetricsTableData();
-        addTableToSlide(threadPoolResultsSlide, threadPoolTableData, 60);
+        addTableToSlide(threadPoolResultsSlide, threadPoolTableData, 160);
         logger.info("Thread Pool Tests Results slide creation complete.");
-    }
-
-    public void createConnectionPoolResultsSlide(XMLSlideShow ppt) {
-        logger.info("Creating Connection Pool Tests Results slide...");
-        XSLFSlide connectionPoolResultsSlide = PPTXReportGenerator.initializeXSLFSlide(ppt);
-        PPTXReportGenerator.createTextBox(connectionPoolResultsSlide, "Connection Pool Tests Results", 30.0, Color.BLACK, 0, true);
-        String[][] connectionPoolTableData = metricsTableGenerator.generateConnectionPoolMetricsTableData();
-        addTableToSlide(connectionPoolResultsSlide, connectionPoolTableData, 100);
-        logger.info("Connection Pool Tests Results slide creation complete.");
     }
 
     private void addTableToSlide(XSLFSlide slide, String[][] tableData, int y) {

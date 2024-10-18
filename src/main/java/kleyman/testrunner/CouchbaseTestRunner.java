@@ -8,6 +8,10 @@ import kleyman.service.CouchbaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 /**
  * This class runs load tests on Couchbase by executing various connection
  * pool and thread pool scenarios while managing Couchbase connections.
@@ -16,32 +20,13 @@ import org.slf4j.LoggerFactory;
 public class CouchbaseTestRunner implements TestRunner {
     private static final Logger logger = LoggerFactory.getLogger(CouchbaseTestRunner.class);
     int numberOfTestRun = 0;
+    private final List<List<CompletableFuture<Void>>> futureLists = new ArrayList<>();
 
     @Override
     public void runTests() {
         logger.info("Starting Couchbase Load Tests");
         runThreadPoolTest();
-        runConnectionPoolTest();
-
         logger.info("All {} load tests completed.", numberOfTestRun);
-    }
-
-    private void runConnectionPoolTest() {
-
-        for (int i = 0; i < CouchbaseLoadTestScenarioProvider.CONNECTION_POOL_SIZE.length; i++) {
-            int connectionPoolSize = CouchbaseLoadTestScenarioProvider.CONNECTION_POOL_SIZE[i];
-            try (CouchbaseConnectionManager connectionManager = createConnectionManager(connectionPoolSize)) {
-                if (initializeCouchbaseBucket(connectionManager)) {
-                    CouchbaseService couchbaseService = new CouchbaseService(connectionManager);
-                    CouchbaseLoadTestScenarioProvider scenarioProvider = new CouchbaseLoadTestScenarioProvider(couchbaseService);
-                    CouchbaseLoadTestExecutor connectionPoolTestExecutor = scenarioProvider.createConnectionPoolScenarios().get(i);
-                    executeSingleLoadTest(connectionPoolTestExecutor);
-                }
-            } catch (Exception e) {
-                logger.error("Error initializing Couchbase connection manager", e);
-            }
-        }
-        logger.info("All connection pool tests completed.");
     }
 
     private void runThreadPoolTest() {
@@ -49,6 +34,7 @@ public class CouchbaseTestRunner implements TestRunner {
             if (initializeCouchbaseBucket(connectionManager)) {
                 CouchbaseService couchbaseService = new CouchbaseService(connectionManager);
                 executeLoadTests(new CouchbaseLoadTestScenarioProvider(couchbaseService).createThreadPoolScenarios());
+                waitForAllTasksToComplete();
             }
         } catch (Exception e) {
             logger.error("Error initializing Couchbase connection manager", e);
@@ -56,9 +42,23 @@ public class CouchbaseTestRunner implements TestRunner {
         logger.info("All thread pool tests completed.");
     }
 
+    private void waitForAllTasksToComplete() {
+        for (List<CompletableFuture<Void>> futureList : futureLists) {
+            try {
+                CompletableFuture<Void> allFutures = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
+                allFutures.join();
+                logger.info("All asynchronous tasks have completed.");
+            } catch (Exception e) {
+                logger.error("Error while waiting for tasks to complete", e);
+            }
+        }
+
+    }
+
     private void executeLoadTests(Iterable<CouchbaseLoadTestExecutor> scenarios) {
         for (CouchbaseLoadTestExecutor scenario : scenarios) {
             executeSingleLoadTest(scenario);
+            futureLists.add(scenario.getFutureList());
         }
     }
 

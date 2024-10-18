@@ -55,8 +55,6 @@ class CouchbaseTestRunnerTest {
         // Call the method which should execute without throwing exceptions
 
         // Then
-        assertDoesNotThrow(() -> {
-            runner.runTests();
-        }, "runTests should not throw exceptions even when initializeBucket fails.");
+        assertDoesNotThrow(runner::runTests, "runTests should not throw exceptions even when initializeBucket fails.");
     }
 }

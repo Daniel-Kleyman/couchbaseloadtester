@@ -60,7 +60,7 @@ public class CouchbaseService implements DataBaseService<JsonObject, CouchbaseMe
             if (jsonObject == null) {
                 throw new CouchbaseException("Document not found for key: " + key);
             }
-            logger.debug("Successfully retrieved JSON document with ID: {}", key);
+            logger.debug("Successfully retrieved JSON document with key: {}", key);
             couchbaseMetrics.incrementGetSuccess();
             return jsonObject;
         } catch (CouchbaseException e) {

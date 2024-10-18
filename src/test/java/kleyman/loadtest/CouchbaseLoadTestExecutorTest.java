@@ -42,7 +42,7 @@ class CouchbaseLoadTestExecutorTest {
         int threadId = 1;
 
         // When
-        String key = loadTestExecutor.createKeyKey(threadId);
+        String key = loadTestExecutor.createUniqueKey(threadId);
 
         // Then
         assertTrue(key.startsWith("user::1::"));
@@ -56,7 +56,7 @@ class CouchbaseLoadTestExecutorTest {
         loadTestExecutor = new CouchbaseLoadTestExecutor(5, "path/to/json", false, couchbaseService, "scenario12");
 
         // When
-        String key = loadTestExecutor.createKeyKey(threadId);
+        String key = loadTestExecutor.createUniqueKey(threadId);
 
         // Then
         assertEquals("user::shared", key);
